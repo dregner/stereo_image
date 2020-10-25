@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<package>
+    <name>gimbal_controller</name>
+    <version>0.0.0</version>
+    <description>A control gimbal</description>
+
+    <maintainer email="daniel_regner@hotmail.com">Daniel Regner</maintainer>
+
+    <license>ASL 2.0</license>
+
+    <url type="website">https://github.com/dregner</url>
+
+
+    <author email="daniel_regner@hotmail.com">Daniel Regner</author>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+
+
+
+    <build_depend>roscpp</build_depend>
+    <build_depend>rospy</build_depend>
+    <build_depend>actionlib_msgs</build_depend>
+    <build_depend>geometry_msgs</build_depend>
+    <build_depend>sensor_msgs</build_depend>
+    <build_depend>std_msgs</build_depend>
+    <build_depend>message_generation</build_depend>
+    <build_depend>darknet_ros</build_depend>
+    <build_depend>darknet_ros_msgs</build_depend>
+    <build_depend>dji_sdk</build_depend>
+
+    <run_depend>roscpp</run_depend>
+    <run_depend>rospy</run_depend>
+    <run_depend>rqt_gui</run_depend>
+    <run_depend>actionlib_msgs</run_depend>
+    <run_depend>geometry_msgs</run_depend>
+    <run_depend>sensor_msgs</run_depend>
+    <run_depend>std_msgs</run_depend>
+    <run_depend>darknet_ros</run_depend>
+    <run_depend>darknet_ros_msgs</run_depend>
+    <run_depend>dji_sdk</run_depend>
+	
+
+
+    <export>
+    </export>
+</package>
+
