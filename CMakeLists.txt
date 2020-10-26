@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-project(gimbal_controller)
+project(stereo_image)
 
 #Adicionando os plugins ROS
 
@@ -58,18 +58,6 @@ elseif()
 endif()
 
 
-add_message_files(
-        FILES
-        BoundingBox.msg
-)
-
-generate_messages(
-        DEPENDENCIES
-        actionlib_msgs
-        geometry_msgs
-        sensor_msgs
-        std_msgs
-)
 
 catkin_package(
         CATKIN_DEPENDS
@@ -80,7 +68,6 @@ catkin_package(
         sensor_msgs
         std_msgs
         darknet_ros
-        darknet_ros_msgs
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -94,71 +81,22 @@ foreach(dir launch models urdf worlds config)
             DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
 
-#########  FEEDBACK CONTROL ##########
-
-#add_executable(inv_kinematic src/gimbal/inverse_kinematic.cpp)
-#target_link_libraries(inv_kinematic ${catkin_LIBRARIES})
-
-add_executable(dji_ik_control src/gimbal/track_control/ik_track_control.cpp)
-#add_dependencies(gimbal_dji dji_sdk_generate_messages_cpp)
-target_link_libraries(dji_ik_control
-                        ${catkin_LIBRARIES}
-                        ${DJIOSDK_LIBRARIES})
-
-add_executable(dji_pid_control src/gimbal/track_control/pid_track_control.cpp)
-#add_dependencies(gimbal_dji dji_sdk_generate_messages_cpp)
-target_link_libraries(dji_pid_control
-        ${catkin_LIBRARIES}
-        ${DJIOSDK_LIBRARIES})
-
-add_executable(dji_pid_imu_control src/gimbal/track_control/pid_track_control_imu.cpp)
-target_link_libraries(dji_pid_imu_control
-                        ${catkin_LIBRARIES}
-                        ${DJIOSDK_LIBRARIES})
 
 
 
-add_executable(dji_ik_imu_control src/gimbal/track_control/ik_track_control_imu.cpp)
-target_link_libraries(dji_ik_imu_control
-        ${catkin_LIBRARIES}
-        ${DJIOSDK_LIBRARIES})
+######### READ SENSORS DJI #################
 
-add_executable(control_imu src/gimbal/position_control/gimbal_imu_control.cpp)
-target_link_libraries(control_imu
-        ${catkin_LIBRARIES}
-        ${DJIOSDK_LIBRARIES})
-
-######### READ BOUNDING BOXES DARKNET ##################
-
-add_executable(read_bb src/darknet/darknet_bb.cpp)
-target_link_libraries(read_bb ${catkin_LIBRARIES})
-
-######### READ/WRITE DJI GIMBAL #################
-
-add_executable(read_image src/gimbal/read_image.cpp)
-target_link_libraries(read_image
-        ${catkin_LIBRARIES}
-        ${DJIOSDK_LIBRARIES})
-
-
-add_executable(read_gimbal src/gimbal/read_gimbal.cpp)
-target_link_libraries(read_gimbal
-        ${catkin_LIBRARIES}
-        ${DJIOSDK_LIBRARIES})
-
-add_executable(write_gimbal src/gimbal/write_gimbal_angle.cpp)
-target_link_libraries(write_gimbal
-        ${catkin_LIBRARIES}
-        ${DJIOSDK_LIBRARIES})
-
-add_executable(read_attitude src/sensors/read_attitude.cpp)
+add_executable(read_attitude src/read_attitude.cpp)
 target_link_libraries(read_attitude ${catkin_LIBRARIES})
 
-add_executable(read_imu src/sensors/read_imu.cpp)
+add_executable(read_imu src/read_imu.cpp)
 target_link_libraries(read_imu ${catkin_LIBRARIES})
 
-add_executable(read_vopositon src/sensors/read_voposition.cpp)
+add_executable(read_vopositon src/read_voposition.cpp)
 target_link_libraries(read_vopositon ${catkin_LIBRARIES})
 
-add_executable(read_imu_gimbal src/sensors/read_gimbal_imu.cpp)
+add_executable(read_imu_gimbal src/read_gimbal_imu.cpp)
 target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES})
+
+add_executable(save_gps_image src/stereo_gps_acquisition.cpp)
+target_link_libraries(save_gps_image ${catkin_LIBRARIES})
