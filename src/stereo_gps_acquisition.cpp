@@ -68,10 +68,7 @@ void callback(const ImageConstPtr &image_R,
     cv::imwrite(writeR.str(), cv_ptr_R->image);
     cv::imwrite(writeL.str(), cv_ptr_L->image);
     if (images_file.is_open()) {
-        images_file << writeR.str()
-                    << "\t" << long_GPS << "\t" << lat_GPS
-                    << "\t" << alt_GPS << "\t" << long_RTK << "\t" << lat_RTK
-                    << "\t" << alt_RTK  << "\n" << writeL.str()
+        images_file << writeR.str() << "\t" << writeL.str()
                     << "\t" << long_GPS << "\t" << lat_GPS
                     << "\t" << alt_GPS << "\t" << long_RTK << "\t" << lat_RTK
                     << "\t" << alt_RTK  << "\n";
@@ -79,11 +76,11 @@ void callback(const ImageConstPtr &image_R,
     ++counter_R;
     ++counter_L;
 
-    std::cerr << "\n Saved Img:  [" <<  writeR.str() << "]\n";
-    std::cerr << "\n Saved Img:  [" <<  writeL.str() << "]\n";
+    std::cerr << "\n Saved Imgs:  [" <<  writeR.str() << "] [" << writeL.str() << "]\n";
+    //std::cerr << "\n Saved Img:  [" <<  writeL.str() << "]\n";
     ROS_INFO("GPS: %f %f %f", long_GPS, lat_GPS, alt_GPS);
     ROS_INFO("RTK: %f %f %f", long_RTK, lat_RTK, alt_RTK);
-    sleep(5);
+    sleep(3);
 
 }
 
@@ -92,17 +89,17 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "stereo_thread");
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<Image> image_sub_R(nh, "/stereo/right/image_raw", 100);
-    message_filters::Subscriber<Image> image_sub_L(nh, "/stereo/left/image_raw", 100);
-    message_filters::Subscriber<NavSatFix> gps_pose(nh, "/dji_sdk/gps_position", 100);
-    message_filters::Subscriber<NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 100);
+    message_filters::Subscriber<Image> image_sub_R(nh, "/stereo/right/image_raw", 1);
+    message_filters::Subscriber<Image> image_sub_L(nh, "/stereo/left/image_raw", 1);
+    message_filters::Subscriber<NavSatFix> gps_pose(nh, "/dji_sdk/gps_position", 1);
+    message_filters::Subscriber<NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 1);
 
     images_file.open("stereo_imagens.txt");
 
 
     typedef sync_policies::ApproximateTime<Image, Image, NavSatFix, NavSatFix> MySyncPolicy;
     // ExactTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
-    Synchronizer<MySyncPolicy> sync(MySyncPolicy(100000), image_sub_R, image_sub_L, gps_pose, rtk_pose);
+    Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L, gps_pose, rtk_pose);
     sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
 
 
