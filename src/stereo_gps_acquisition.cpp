@@ -68,13 +68,9 @@ void callback(const ImageConstPtr &image_R,
     cv::imwrite(writeR.str(), cv_ptr_R->image);
     cv::imwrite(writeL.str(), cv_ptr_L->image);
     if (images_file.is_open()) {
-        images_file << "image_R" << counter_R << ".png"
-                    << "\t" << long_GPS << "\t" << lat_GPS
-                    << "\t" << alt_GPS << "\t" << long_RTK << "\t" << lat_RTK
-                    << "\t" << alt_RTK  << "\n" << "image_L" << counter_L << ".png"
-                    << "\t" << long_GPS << "\t" << lat_GPS
-                    << "\t" << alt_GPS << "\t" << long_RTK << "\t" << lat_RTK
-                    << "\t" << alt_RTK  << "\n";
+        images_file << writeR.str() << "\t" << writeL.str()
+                    << "\t" << long_GPS << "\t" << lat_GPS << "\t" << alt_GPS
+                    << "\t" << long_RTK << "\t" << lat_RTK << "\t" << alt_RTK <<  "\n";
     }
     ++counter_R;
     ++counter_L;
