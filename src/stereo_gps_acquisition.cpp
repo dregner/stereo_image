@@ -63,12 +63,15 @@ void callback(const ImageConstPtr &image_R,
 
     std::stringstream writeR;
     std::stringstream writeL;
-    writeR << "labmetro_image_R" << counter_R << ".png";
-    writeL << "labmetro_image_L" << counter_L << ".png";
+    writeR << "image_R" << counter_R << ".png";
+    writeL << "image_L" << counter_L << ".png";
     cv::imwrite(writeR.str(), cv_ptr_R->image);
     cv::imwrite(writeL.str(), cv_ptr_L->image);
     if (images_file.is_open()) {
-        images_file << writeR.str() << "\t" << writeL.str()
+        images_file << "image_R" << counter_R << ".png"
+                    << "\t" << long_GPS << "\t" << lat_GPS
+                    << "\t" << alt_GPS << "\t" << long_RTK << "\t" << lat_RTK
+                    << "\t" << alt_RTK  << "\n" << "image_L" << counter_L << ".png"
                     << "\t" << long_GPS << "\t" << lat_GPS
                     << "\t" << alt_GPS << "\t" << long_RTK << "\t" << lat_RTK
                     << "\t" << alt_RTK  << "\n";
@@ -80,7 +83,7 @@ void callback(const ImageConstPtr &image_R,
     //std::cerr << "\n Saved Img:  [" <<  writeL.str() << "]\n";
     ROS_INFO("GPS: %f %f %f", long_GPS, lat_GPS, alt_GPS);
     ROS_INFO("RTK: %f %f %f", long_RTK, lat_RTK, alt_RTK);
-    sleep(3);
+    sleep(5);
 
 }
 
@@ -94,7 +97,7 @@ int main(int argc, char **argv) {
     message_filters::Subscriber<NavSatFix> gps_pose(nh, "/dji_sdk/gps_position", 1);
     message_filters::Subscriber<NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 1);
 
-    images_file.open("stereo_imagens.txt");
+    images_file.open("stereo_images.txt");
 
 
     typedef sync_policies::ApproximateTime<Image, Image, NavSatFix, NavSatFix> MySyncPolicy;
@@ -102,8 +105,8 @@ int main(int argc, char **argv) {
     Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L, gps_pose, rtk_pose);
     sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
 
-
-    ros::spin();
-
+    while(ros::ok()) {
+        ros::spinOnce();
+    }
     return 0;
 }
