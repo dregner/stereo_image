@@ -100,3 +100,5 @@ target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES})
 
 add_executable(save_gps_image src/stereo_gps_acquisition.cpp)
 target_link_libraries(save_gps_image ${catkin_LIBRARIES})
+add_executable(save_gps_imu_image src/stereo_gps_imu_acquisition.cpp)
+target_link_libraries(save_gps_imu_image ${catkin_LIBRARIES})
