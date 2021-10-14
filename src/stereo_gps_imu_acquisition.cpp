@@ -8,7 +8,7 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <fstream>
 #include <image_transport/image_transport.h>
-#include <ignition/math2/ignition/math/Pose3.hh>
+#include <ignition/math/Pose3.hh>
 
 
 using namespace sensor_msgs;

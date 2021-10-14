@@ -6,7 +6,7 @@
 #include <geometry_msgs/Vector3Stamped.h>
 #include <iostream>
 #include <sensor_msgs/Imu.h>
-#include <ignition/math2/ignition/math/Pose3.hh>
+#include <ignition/math/Pose3.hh>
 
 
 #define RAD2DEG(RAD) ((RAD) * (180.0) / (M_PI))

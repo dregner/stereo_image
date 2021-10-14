@@ -3,7 +3,7 @@
 //
 #include <geometry_msgs/QuaternionStamped.h>
 #include <ros/ros.h>
-#include <ignition/math2/ignition/math/Pose3.hh>
+#include <ignition/math/Pose3.hh>
 
 
 #define RAD2DEG(RAD) ((RAD) * 180 / M_PI)

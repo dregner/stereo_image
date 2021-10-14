@@ -4,7 +4,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
-#include <ignition/math2/ignition/math/Pose3.hh>
+#include <ignition/math/Pose3.hh>
 
 #define RAD2DEG(RAD) ((RAD) * 180 / M_PI)
 

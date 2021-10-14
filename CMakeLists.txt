@@ -6,7 +6,7 @@ project(stereo_image)
 include_directories(${roscpp_INCLUDE_DIRS})
 include_directories(${std_msgs_INCLUDE_DIRS})
 
-
+find_package(ignition-math4)
 find_package(catkin REQUIRED COMPONENTS
         roscpp
         rospy
@@ -87,18 +87,18 @@ endforeach(dir)
 ######### READ SENSORS DJI #################
 
 add_executable(read_attitude src/read_attitude.cpp)
-target_link_libraries(read_attitude ${catkin_LIBRARIES})
+target_link_libraries(read_attitude ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
 add_executable(read_imu src/read_imu.cpp)
-target_link_libraries(read_imu ${catkin_LIBRARIES})
+target_link_libraries(read_imu ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
 add_executable(read_vopositon src/read_voposition.cpp)
-target_link_libraries(read_vopositon ${catkin_LIBRARIES})
+target_link_libraries(read_vopositon ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
 add_executable(read_imu_gimbal src/read_gimbal_imu.cpp)
-target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES})
+target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
 add_executable(save_gps_image src/stereo_gps_acquisition.cpp)
-target_link_libraries(save_gps_image ${catkin_LIBRARIES})
+target_link_libraries(save_gps_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 add_executable(save_gps_imu_image src/stereo_gps_imu_acquisition.cpp)
-target_link_libraries(save_gps_imu_image ${catkin_LIBRARIES})
+target_link_libraries(save_gps_imu_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
