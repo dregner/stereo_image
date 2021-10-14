@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8)
 project(stereo_image)
 
 #Adicionando os plugins ROS
@@ -18,33 +18,20 @@ find_package(catkin REQUIRED COMPONENTS
         darknet_ros)
 
 find_package(DJIOSDK REQUIRED)
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
-
+#set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_STANDARD 14)
 find_package(darknet_ros QUIET)
 if(darknet_ros_FOUND)
     message(STATUS "Found darknet_ros package, will use it for object depth perception demo.")
     add_definitions(-DUSE_DARKNET_ROS)
 endif()
 
-find_package(OpenCV 3.3.0 QUIET)
+find_package(OpenCV REQUIRED)
 if (OpenCV_FOUND)
-    message(STATUS "Found OpenCV ${OpenCV_VERSION} installed in the system, will use it for depth perception sample")
-    message(STATUS " - Includes: ${OpenCV_INCLUDE_DIRS}")
-    add_definitions(-DOPEN_CV_INSTALLED)
-    set(OPEN_CV_3_3_0_INSTALLED TRUE)
-
-    find_package(OpenCVContribImgProc QUIET)
-
-    find_package(OpenCVViz QUIET)
-else()
-    find_package(OpenCV QUIET )
-    if (OpenCV_FOUND)
-        message(STATUS "Found OpenCV ${OpenCV_VERSION} installed in the system, depth percpetion demo requires 3.3.0+ for better experience")
-        message(STATUS " - Includes: ${OpenCV_INCLUDE_DIRS}")
-        add_definitions(-DOPEN_CV_INSTALLED)
-    else()
-        message(STATUS "Did not find OpenCV in the system, image data is inside RecvContainer as raw data")
-    endif()
+#    message(STATUS "Found OpenCV ${OpenCV_VERSION} installed in the system, will use it for depth perception sample")
+#    message(STATUS " - Includes: ${OpenCV_INCLUDE_DIRS}")
+#    add_definitions(-DOPEN_CV_INSTALLED)
+    include_directories( ${OpenCV_INCLUDE_DIRS})
 endif()
 
 
@@ -92,14 +79,18 @@ target_link_libraries(read_attitude ${catkin_LIBRARIES} ignition-math4::ignition
 add_executable(read_imu src/read_imu.cpp)
 target_link_libraries(read_imu ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
-add_executable(read_vopositon src/read_voposition.cpp)
-target_link_libraries(read_vopositon ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
 add_executable(read_imu_gimbal src/read_gimbal_imu.cpp)
 target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
+add_executable(show_image src/show_stereo.cpp)
+target_link_libraries(show_image ${OpenCV_LIBS})
+
 add_executable(save_image src/stereo_acquisition.cpp)
 target_link_libraries(save_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
+
+add_executable(calib_stereo src/calib_stereo.cpp)
+target_link_libraries(calib_stereo  ${OpenCV_LIBS})
 
 add_executable(save_gps_image src/stereo_gps_acquisition.cpp)
 target_link_libraries(save_gps_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
