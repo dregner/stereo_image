@@ -98,7 +98,11 @@ target_link_libraries(read_vopositon ${catkin_LIBRARIES} ignition-math4::ignitio
 add_executable(read_imu_gimbal src/read_gimbal_imu.cpp)
 target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
+add_executable(save_image src/stereo_acquisition.cpp)
+target_link_libraries(save_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
+
 add_executable(save_gps_image src/stereo_gps_acquisition.cpp)
 target_link_libraries(save_gps_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
+
 add_executable(save_gps_imu_image src/stereo_gps_imu_acquisition.cpp)
 target_link_libraries(save_gps_imu_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
