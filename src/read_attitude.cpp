@@ -14,10 +14,11 @@ void callback(const geometry_msgs::QuaternionStamped::ConstPtr &msg){
     ignition::math::Quaterniond rpy;
     rpy.Set(msg->quaternion.w, msg->quaternion.x, msg->quaternion.y, msg->quaternion.z);
 
-    cout << "R: " << RAD2DEG(rpy.Roll()) << endl;
-    cout << "P: " << RAD2DEG(rpy.Pitch()) << endl;
-    cout << "Y: " << RAD2DEG(rpy.Yaw()) << endl;
-    cout << "OFFSET YAW:" << -90+RAD2DEG(rpy.Yaw()) << endl;
+    cout << "R: " << RAD2DEG(rpy.Roll()) << "\tP: " << RAD2DEG(rpy.Pitch()) << "\tY: " << RAD2DEG(rpy.Yaw()) << endl;
+    cout << "OFFSET" << endl;
+    cout << "R: " << RAD2DEG(rpy.Roll()) << "\tP: " << RAD2DEG(rpy.Pitch()) << "\tY: " << 85-RAD2DEG(rpy.Yaw()) << endl;
+    cout << "Quaternion" << endl;
+    cout << "w: " << msg->quaternion.w << "\tx: " << msg->quaternion.x << "\ty: " << msg->quaternion.y << "\tz: " << msg->quaternion.z << endl;
     cout << "\033[2J\033[1;1H";     // clear terminal
 
 
