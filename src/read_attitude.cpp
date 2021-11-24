@@ -16,7 +16,7 @@ void callback(const geometry_msgs::QuaternionStamped::ConstPtr &msg){
 
     cout << "R: " << RAD2DEG(rpy.Roll()) << "\tP: " << RAD2DEG(rpy.Pitch()) << "\tY: " << RAD2DEG(rpy.Yaw()) << endl;
     cout << "OFFSET" << endl;
-    cout << "R: " << RAD2DEG(rpy.Roll()) << "\tP: " << RAD2DEG(rpy.Pitch()) << "\tY: " << 85-RAD2DEG(rpy.Yaw()) << endl;
+    cout << "R: " << RAD2DEG(rpy.Roll()) << "\tP: " << RAD2DEG(rpy.Pitch()) << "\tY: " << -90+RAD2DEG(rpy.Yaw()) << endl;
     cout << "Quaternion" << endl;
     cout << "w: " << msg->quaternion.w << "\tx: " << msg->quaternion.x << "\ty: " << msg->quaternion.y << "\tz: " << msg->quaternion.z << endl;
     cout << "\033[2J\033[1;1H";     // clear terminal
