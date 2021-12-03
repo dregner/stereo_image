@@ -19,17 +19,14 @@ using namespace message_filters;
 double RadToDeg = 180 / M_PI;
 
 
-
-static int counter_R = 0;
-static int counter_L = 0;
-
+static int counter = 1;
 
 std::string decimal(int r);
 
 static std::ofstream images_file;
 
-void callback(const ImageConstPtr &image_R,
-              const ImageConstPtr &image_L) {
+void callback(const sensor_msgs::ImageConstPtr &image_R,
+              const sensor_msgs::ImageConstPtr &image_L) {
 
     cv_bridge::CvImagePtr cv_ptr_R;
     cv_bridge::CvImagePtr cv_ptr_L;
@@ -47,13 +44,13 @@ void callback(const ImageConstPtr &image_R,
 
     std::stringstream writeR;
     std::stringstream writeL;
-    writeR << "image_R" << counter_R << ".png";
-    writeL << "image_L" << counter_L << ".png";
-    cv::imwrite(writeR.str(), cv_ptr_R->image);
+    writeR << "image_R" << counter << ".png";
+    writeL << "image_L" << counter << ".png";
     cv::imwrite(writeL.str(), cv_ptr_L->image);
+    cv::imwrite(writeR.str(), cv_ptr_R->image);
+    std::cout << "Aqcuired Image -" << counter << std::endl;
 
-    ++counter_R;
-    ++counter_L;
+    ++counter;
 }
 
 int main(int argc, char **argv) {
@@ -61,17 +58,18 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "stereo_thread");
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<Image> image_sub_R(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
-    message_filters::Subscriber<Image> image_sub_L(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/stereo/right/image_raw", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/stereo/left/image_raw", 1);
 
 
-    typedef sync_policies::ApproximateTime<Image, Image> MySyncPolicy;
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> MySyncPolicy;
     // ExactTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
-    Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L);
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1), image_sub_R, image_sub_L);
     sync.registerCallback(boost::bind(&callback, _1, _2));
-
+/*
     while(ros::ok()) {
         ros::spinOnce();
-    }
+    }*/
+    ros::spin();
     return 0;
 }

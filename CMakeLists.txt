@@ -85,8 +85,15 @@ target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES} ignition-math4::igniti
 add_executable(show_image src/show_stereo.cpp)
 target_link_libraries(show_image ${OpenCV_LIBS})
 
+
 add_executable(save_image src/stereo_acquisition.cpp)
-target_link_libraries(save_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
+target_link_libraries(save_image ${catkin_LIBRARIES} )
+
+add_executable(save_left src/save_left.cpp)
+target_link_libraries(save_left ${catkin_LIBRARIES} )
+
+add_executable(save_right src/save_right.cpp)
+target_link_libraries(save_right ${catkin_LIBRARIES})
 
 add_executable(calib_stereo src/calib_stereo.cpp)
 target_link_libraries(calib_stereo  ${OpenCV_LIBS})
