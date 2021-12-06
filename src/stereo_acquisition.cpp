@@ -31,6 +31,17 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
     cv_bridge::CvImagePtr cv_ptr_R;
     cv_bridge::CvImagePtr cv_ptr_L;
 
+    // Renaming images to the correct format.
+    std::string img_counter = "";
+    if (counter < 10) {
+        img_counter = "000";
+    } else if (counter > 9 && counter < 100) {
+        img_counter = "00";
+    } else if (counter < 99 && counter > 1000){
+        img_counter = "0";
+    }
+
+
     namespace enc = sensor_msgs::image_encodings;
 
     try {
@@ -44,11 +55,14 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
 
     std::stringstream writeR;
     std::stringstream writeL;
-    writeR << "image_R" << counter << ".png";
-    writeL << "image_L" << counter << ".png";
+    writeR << "R" << img_counter << counter << ".png";
+    writeL << "L" << img_counter << counter << ".png";
     cv::imwrite(writeL.str(), cv_ptr_L->image);
     cv::imwrite(writeR.str(), cv_ptr_R->image);
     std::cout << "Aqcuired Image -" << counter << std::endl;
+
+    std::cout << "Press Enter to Continue";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
 
     ++counter;
 }
