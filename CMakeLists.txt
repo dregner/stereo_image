@@ -14,8 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
         cv_bridge
         image_transport
         geometry_msgs
-        dji_sdk
-        darknet_ros)
+        dji_sdk)
 
 find_package(DJIOSDK REQUIRED)
 #set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -26,7 +25,7 @@ if(darknet_ros_FOUND)
     add_definitions(-DUSE_DARKNET_ROS)
 endif()
 
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV REQUIRED)
 if (OpenCV_FOUND)
     message(STATUS "Found OpenCV ${OpenCV_VERSION} installed in the system, will use it for depth perception sample")
     message(STATUS " - Includes: ${OpenCV_INCLUDE_DIRS}")
@@ -53,7 +52,6 @@ catkin_package(
         geometry_msgs
         sensor_msgs
         std_msgs
-        darknet_ros
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
