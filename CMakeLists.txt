@@ -59,7 +59,7 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-        "/usr/include/ignition/math2")
+        "/usr/include/ignition/math4")
 
 
 foreach(dir launch models urdf worlds config)
