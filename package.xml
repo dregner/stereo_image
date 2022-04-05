@@ -24,8 +24,8 @@
     <build_depend>geometry_msgs</build_depend>
     <build_depend>sensor_msgs</build_depend>
     <build_depend>std_msgs</build_depend>
-    <build_depend>darknet_ros</build_depend>
     <build_depend>dji_sdk</build_depend>
+    <build_depend>stereo_vant</build_depend>
 
     <run_depend>roscpp</run_depend>
     <run_depend>rospy</run_depend>
@@ -34,9 +34,9 @@
     <run_depend>geometry_msgs</run_depend>
     <run_depend>sensor_msgs</run_depend>
     <run_depend>std_msgs</run_depend>
-    <run_depend>darknet_ros</run_depend>
     <run_depend>dji_sdk</run_depend>
-	
+    <run_depend>stereo_vant</run_depend>
+
 
 
     <export>

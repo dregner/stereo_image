@@ -15,8 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
         image_transport
         geometry_msgs
         dji_sdk
-        darknet_ros)
 
+        )
 find_package(DJIOSDK REQUIRED)
 #set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 14)
@@ -25,6 +25,7 @@ if(darknet_ros_FOUND)
     message(STATUS "Found darknet_ros package, will use it for object depth perception demo.")
     add_definitions(-DUSE_DARKNET_ROS)
 endif()
+
 
 find_package(OpenCV 3 REQUIRED)
 if (OpenCV_FOUND)
@@ -53,13 +54,14 @@ catkin_package(
         geometry_msgs
         sensor_msgs
         std_msgs
-        darknet_ros
+        dji_sdk
+        stereo_vant
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-        "/usr/include/ignition/math2")
+        "/usr/include/ignition/math4")
 
 
 foreach(dir launch models urdf worlds config)
@@ -89,11 +91,9 @@ target_link_libraries(show_image ${OpenCV_LIBS})
 add_executable(save_image src/stereo_acquisition.cpp)
 target_link_libraries(save_image ${catkin_LIBRARIES} )
 
-add_executable(save_left src/save_left.cpp)
-target_link_libraries(save_left ${catkin_LIBRARIES} )
+add_executable(save_zed src/zed_stereo_acquisition.cpp)
+target_link_libraries(save_zed ${catkin_LIBRARIES} ignition-math4::ignition-math4)
 
-add_executable(save_right src/save_right.cpp)
-target_link_libraries(save_right ${catkin_LIBRARIES})
 
 add_executable(calib_stereo src/calib_stereo.cpp)
 target_link_libraries(calib_stereo  ${OpenCV_LIBS})

@@ -8,7 +8,6 @@
 #include <sensor_msgs/Imu.h>
 #include <ignition/math/Pose3.hh>
 
-
 #define RAD2DEG(RAD) ((RAD) * (180.0) / (M_PI))
 #define DEG2RAD(DEG) ((DEG) * (M_PI) / (180.0))
 
