@@ -15,7 +15,7 @@
 
 double RadToDeg = 180 / M_PI;
 
-
+bool first_time = true;
 static int counter = 1;
 
 std::string decimal(int r);
@@ -65,6 +65,14 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
     cv::imwrite(writeR.str(), cv_ptr_R->image);
     std::cout << "Aqcuired Image -" << counter << std::endl;
     if (images_file.is_open()) {
+        if(first_time){
+            images_file << "\t" << "GPS LON" << "\t" << "GPS LAT" << "\t" << "GPS ALT"
+                    << "\t" << "RTK LON" << "\t" << "RTK LAT" << "\t" << "RTK ALT"
+                    << "\t" <<  "DJI IMU R" << "\t" << "DJI IMU P"  << "\t" << "DJI IMU Y"
+                    << "\t" <<  "ZED2 IMU R" << "\t" << "ZED2 IMU P"  << "\t" << "ZED2 IMU Y" << "\n";
+
+            first_time = false;
+        }
         images_file << counter
                     << "\t" << gps->longitude << "\t" << gps->latitude << "\t" << gps->altitude
                     << "\t" << rtk->longitude << "\t" << rtk->latitude << "\t" << rtk->altitude
@@ -72,7 +80,7 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
                     << "\t" <<  zed_imu_eu.Roll() << "\t" << zed_imu_eu.Pitch()  << "\t" << zed_imu_eu.Yaw() << "\n";
     }
     ROS_INFO("GPS: %f %f %f", gps->longitude, gps->latitude, gps->altitude);
-        ROS_INFO("RTK: %f %f %f", rtk->longitude, rtk->latitude, rtk->altitude);
+    ROS_INFO("RTK: %f %f %f", rtk->longitude, rtk->latitude, rtk->altitude);
     ROS_INFO("DJI IMU: %f %f %f", dji_imu_eu.Roll(), dji_imu_eu.Pitch(), dji_imu_eu.Yaw());
     ROS_INFO("ZED IMU: %f %f %f", zed_imu_eu.Roll(), zed_imu_eu.Pitch(), zed_imu_eu.Yaw());
     sleep(1);
@@ -87,11 +95,14 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "zed_gps_imu_thread");
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 10);
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 10);
+    images_file.open("zed_images.txt");
+
+
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 1);
     message_filters::Subscriber<sensor_msgs::NavSatFix> gps_sub(nh, "/dji_sdk/gps_position", 1);
     message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_sub(nh, "/dji_sdk/rtk_position", 1);
-    message_filters::Subscriber<sensor_msgs::Imu> zed_imu_sub(nh, "/zed2/imu", 1);
+    message_filters::Subscriber<sensor_msgs::Imu> zed_imu_sub(nh, "/zed2/zed_node/imu/data", 1);
     message_filters::Subscriber<sensor_msgs::Imu> dji_imu_sub(nh, "/dji_sdk/imu", 1);
 
 
@@ -99,7 +110,7 @@ int main(int argc, char **argv) {
             sensor_msgs::NavSatFix, sensor_msgs::NavSatFix,
             sensor_msgs::Imu, sensor_msgs::Imu> MySyncPolicy;
     // ExactTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
-    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), image_sub_R, image_sub_L,
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L,
                                                      gps_sub, rtk_sub,
                                                      zed_imu_sub, dji_imu_sub);
     sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5, _6));
