@@ -94,7 +94,6 @@ target_link_libraries(save_image ${catkin_LIBRARIES} )
 add_executable(save_zed src/zed_stereo_acquisition.cpp)
 target_link_libraries(save_zed ${catkin_LIBRARIES} ignition-math4::ignition-math4)
 
-
 add_executable(calib_stereo src/calib_stereo.cpp)
 target_link_libraries(calib_stereo  ${OpenCV_LIBS})
 

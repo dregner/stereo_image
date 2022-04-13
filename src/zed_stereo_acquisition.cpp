@@ -10,8 +10,6 @@
 #include <sensor_msgs/Imu.h>
 #include <ignition/math/Pose3.hh>
 
-
-
 /// Variavel para leitura GPS RTK
 
 
@@ -35,7 +33,6 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
 
     dji_imu_eu.Set(dji_imu->orientation.w, dji_imu->orientation.x, dji_imu->orientation.y, dji_imu->orientation.z);
     zed_imu_eu.Set(zed_imu->orientation.w, zed_imu->orientation.x, zed_imu->orientation.y, zed_imu->orientation.z);
-
     cv_bridge::CvImagePtr cv_ptr_R;
     cv_bridge::CvImagePtr cv_ptr_L;
     // Renaming images to the correct format.
@@ -90,8 +87,8 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "zed_gps_imu_thread");
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/stereo/right/image_raw", 10);
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/stereo/left/image_raw", 10);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 10);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 10);
     message_filters::Subscriber<sensor_msgs::NavSatFix> gps_sub(nh, "/dji_sdk/gps_position", 1);
     message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_sub(nh, "/dji_sdk/rtk_position", 1);
     message_filters::Subscriber<sensor_msgs::Imu> zed_imu_sub(nh, "/zed2/imu", 1);
