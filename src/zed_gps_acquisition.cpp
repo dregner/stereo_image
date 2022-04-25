@@ -9,12 +9,6 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/CompressedImage.h>
 
-
-using namespace sensor_msgs;
-
-using namespace message_filters;
-
-
 /// Variavel para leitura GPS RTK
 
 
@@ -35,10 +29,10 @@ std::string decimal(int r);
 
 static std::ofstream images_file;
 
-void callback(const CompressedImageConstPtr &image_R,
-              const ImageConstPtr &image_L,
-              const NavSatFixConstPtr &pose_GPS,
-              const NavSatFixConstPtr &pose_RTK) {
+void callback(const sensor_msgs::CompressedImageConstPtr &image_R,
+              const sensor_msgs::ImageConstPtr &image_L,
+              const sensor_msgs::NavSatFixConstPtr &pose_GPS,
+              const sensor_msgs::NavSatFixConstPtr &pose_RTK) {
 
     long_GPS = pose_GPS->longitude;
     lat_GPS = pose_GPS->latitude;
@@ -90,17 +84,17 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "stereo_thread");
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<CompressedImage> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color/compressed", 1);
-    message_filters::Subscriber<Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 1);
-    message_filters::Subscriber<NavSatFix> gps_pose(nh, "/dji_sdk/gps_position", 1);
-    message_filters::Subscriber<NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 1);
+    message_filters::Subscriber<sensor_msgs::CompressedImage> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color/compressed", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 1);
+    message_filters::Subscriber<sensor_msgs::NavSatFix> gps_pose(nh, "/dji_sdk/gps_position", 1);
+    message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 1);
 
     images_file.open("stereo_images.txt");
 
 
-    typedef sync_policies::ApproximateTime<CompressedImage, Image, NavSatFix, NavSatFix> MySyncPolicy;
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::CompressedImage, sensor_msgs::Image, sensor_msgs::NavSatFix, sensor_msgs::NavSatFix> MySyncPolicy;
     // ExactTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
-    Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L, gps_pose, rtk_pose);
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L, gps_pose, rtk_pose);
     sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
 
     while(ros::ok()) {

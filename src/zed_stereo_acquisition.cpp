@@ -9,7 +9,7 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/Imu.h>
 #include <ignition/math/Pose3.hh>
-
+#include <dji_sdk/CameraAction.h>
 /// Variavel para leitura GPS RTK
 
 
@@ -19,10 +19,19 @@ bool first_time = true;
 static int counter = 1;
 
 std::string decimal(int r);
+
 ignition::math::Quaterniond dji_imu_eu;
 ignition::math::Quaterniond zed_imu_eu;
 
 static std::ofstream images_file;
+ros::ServiceClient take_photo;
+
+bool dji_takePicture() {
+    dji_sdk::CameraAction cameraAction;
+    cameraAction.request.camera_action = 0;
+    take_photo.call(cameraAction);
+    return cameraAction.response.result;
+}
 
 void callback(const sensor_msgs::ImageConstPtr &image_R,
               const sensor_msgs::ImageConstPtr &image_L,
@@ -47,47 +56,43 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
 
 
     namespace enc = sensor_msgs::image_encodings;
-
-    try {
-        cv_ptr_R = cv_bridge::toCvCopy(image_R, sensor_msgs::image_encodings::BGR8);
-        cv_ptr_L = cv_bridge::toCvCopy(image_L, sensor_msgs::image_encodings::BGR8);
-    }
-    catch (cv_bridge::Exception &e) {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
-    }
-
-    std::stringstream writeR;
-    std::stringstream writeL;
-    writeR << "R" << img_counter << counter << ".png";
-    writeL << "L" << img_counter << counter << ".png";
-    cv::imwrite(writeL.str(), cv_ptr_L->image);
-    cv::imwrite(writeR.str(), cv_ptr_R->image);
-    std::cout << "Aqcuired Image -" << counter << std::endl;
-    if (images_file.is_open()) {
-        if(first_time){
-            images_file << "\t" << "GPS LON" << "\t" << "GPS LAT" << "\t" << "GPS ALT"
-                    << "\t" << "RTK LON" << "\t" << "RTK LAT" << "\t" << "RTK ALT"
-                    << "\t" <<  "DJI IMU R" << "\t" << "DJI IMU P"  << "\t" << "DJI IMU Y"
-                    << "\t" <<  "ZED2 IMU R" << "\t" << "ZED2 IMU P"  << "\t" << "ZED2 IMU Y" << "\n";
-
-            first_time = false;
+    if (dji_takePicture()) {
+        try {
+            cv_ptr_R = cv_bridge::toCvCopy(image_R, sensor_msgs::image_encodings::BGR8);
+            cv_ptr_L = cv_bridge::toCvCopy(image_L, sensor_msgs::image_encodings::BGR8);
         }
-        images_file << counter
-                    << "\t" << gps->longitude << "\t" << gps->latitude << "\t" << gps->altitude
-                    << "\t" << rtk->longitude << "\t" << rtk->latitude << "\t" << rtk->altitude
-                    << "\t" <<  dji_imu_eu.Roll() << "\t" << dji_imu_eu.Pitch()  << "\t" << dji_imu_eu.Yaw()
-                    << "\t" <<  zed_imu_eu.Roll() << "\t" << zed_imu_eu.Pitch()  << "\t" << zed_imu_eu.Yaw() << "\n";
-    }
-    ROS_INFO("GPS: %f %f %f", gps->longitude, gps->latitude, gps->altitude);
-    ROS_INFO("RTK: %f %f %f", rtk->longitude, rtk->latitude, rtk->altitude);
-    ROS_INFO("DJI IMU: %f %f %f", dji_imu_eu.Roll(), dji_imu_eu.Pitch(), dji_imu_eu.Yaw());
-    ROS_INFO("ZED IMU: %f %f %f", zed_imu_eu.Roll(), zed_imu_eu.Pitch(), zed_imu_eu.Yaw());
-    sleep(1);
+        catch (cv_bridge::Exception &e) {
+            ROS_ERROR("cv_bridge exception: %s", e.what());
+            return;
+        }
+
+        std::stringstream writeR;
+        std::stringstream writeL;
+        writeR << "R" << img_counter << counter << ".png";
+        writeL << "L" << img_counter << counter << ".png";
+        cv::imwrite(writeL.str(), cv_ptr_L->image);
+        cv::imwrite(writeR.str(), cv_ptr_R->image);
+        std::cout << "Aqcuired Image -" << counter << std::endl;
+        if (images_file.is_open()) {
+            images_file << counter
+                        << "\t" << gps->longitude << "\t" << gps->latitude << "\t" << gps->altitude
+                        << "\t" << rtk->longitude << "\t" << rtk->latitude << "\t" << rtk->altitude
+                        << "\t" << dji_imu_eu.Roll() << "\t" << dji_imu_eu.Pitch() << "\t" << dji_imu_eu.Yaw()
+                        << "\t" << zed_imu_eu.Roll() << "\t" << zed_imu_eu.Pitch() << "\t" << zed_imu_eu.Yaw() << "\n";
+        }
+
+        ROS_INFO("Gimbal image taken, check SD card our RC");
+        ROS_INFO("GPS: %f %f %f", gps->longitude, gps->latitude, gps->altitude);
+        ROS_INFO("RTK: %f %f %f", rtk->longitude, rtk->latitude, rtk->altitude);
+        ROS_INFO("DJI IMU: %f %f %f", dji_imu_eu.Roll(), dji_imu_eu.Pitch(), dji_imu_eu.Yaw());
+        ROS_INFO("ZED IMU: %f %f %f", zed_imu_eu.Roll(), zed_imu_eu.Pitch(), zed_imu_eu.Yaw());
+        sleep(1);
 //    std::cout << "Press Enter to Continue";
 //    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-    ++counter;
+        ++counter;
+    } else {
+        ROS_WARN("Error taking Gimbal's image");
+    }
 }
 
 int main(int argc, char **argv) {
@@ -96,7 +101,14 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh;
 
     images_file.open("zed_images.txt");
+    if (images_file.is_open()) {
+        images_file << "\t" << "GPS LON" << "\t" << "GPS LAT" << "\t" << "GPS ALT"
+                    << "\t" << "RTK LON" << "\t" << "RTK LAT" << "\t" << "RTK ALT"
+                    << "\t" << "DJI IMU R" << "\t" << "DJI IMU P" << "\t" << "DJI IMU Y"
+                    << "\t" << "ZED2 IMU R" << "\t" << "ZED2 IMU P" << "\t" << "ZED2 IMU Y" << "\n";
 
+    }
+    take_photo = nh.serviceClient<dji_sdk::CameraAction>("/dji_sdk/camera_action");
 
     message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 1);
     message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 1);

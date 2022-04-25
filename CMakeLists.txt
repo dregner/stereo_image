@@ -102,3 +102,6 @@ target_link_libraries(save_gps_image ${catkin_LIBRARIES} ignition-math4::ignitio
 
 add_executable(save_gps_imu_image src/stereo_gps_imu_acquisition.cpp)
 target_link_libraries(save_gps_imu_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
+
+add_executable(zed_stereo src/zed_gps_acquisition.cpp)
+target_link_libraries(zed_stereo ${catkin_LIBRARIES} ignition-math4::ignition-math4)
