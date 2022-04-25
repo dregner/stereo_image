@@ -10,7 +10,7 @@
 #include <sensor_msgs/Imu.h>
 #include <ignition/math/Pose3.hh>
 #include <dji_sdk/CameraAction.h>
-
+#include <geometry_msgs/Vector3Stamped.h>
 
 
 static int counter = 1;
@@ -31,6 +31,7 @@ bool dji_takePicture() {
 
 void callback(const sensor_msgs::ImageConstPtr &image_R,
               const sensor_msgs::ImageConstPtr &image_L,
+              const geometry_msgs::Vector3StampedConstPtr &gimbal,
               const sensor_msgs::NavSatFixConstPtr &gps,
               const sensor_msgs::NavSatFixConstPtr &rtk,
               const sensor_msgs::ImuConstPtr &zed_imu,
@@ -49,7 +50,6 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
     } else if (99 < counter && counter < 1000) {
         img_counter = "0";
     }
-
 
 
     if (dji_takePicture()) {
@@ -73,6 +73,7 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
             images_file << counter
                         << "\t" << gps->longitude << "\t" << gps->latitude << "\t" << gps->altitude
                         << "\t" << rtk->longitude << "\t" << rtk->latitude << "\t" << rtk->altitude
+                        << "\t" << gimbal->vector.y << "\t" << gimbal->vector.x << "\t" << gimbal->vector.z
                         << "\t" << dji_imu_eu.Roll() << "\t" << dji_imu_eu.Pitch() << "\t" << dji_imu_eu.Yaw()
                         << "\t" << zed_imu_eu.Roll() << "\t" << zed_imu_eu.Pitch() << "\t" << zed_imu_eu.Yaw() << "\n";
         }
@@ -80,6 +81,7 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
         ROS_INFO("Gimbal image taken, check SD card our RC");
         ROS_INFO("GPS: %f %f %f", gps->longitude, gps->latitude, gps->altitude);
         ROS_INFO("RTK: %f %f %f", rtk->longitude, rtk->latitude, rtk->altitude);
+        ROS_INFO("GIMBAL: %f, %f, %f", gimbal->vector.y, gimbal->vector.x, gimbal->vector.z);
         ROS_INFO("DJI IMU: %f %f %f", dji_imu_eu.Roll(), dji_imu_eu.Pitch(), dji_imu_eu.Yaw());
         ROS_INFO("ZED IMU: %f %f %f", zed_imu_eu.Roll(), zed_imu_eu.Pitch(), zed_imu_eu.Yaw());
         sleep(1);
@@ -98,10 +100,11 @@ int main(int argc, char **argv) {
 
     images_file.open("zed_images.txt");
     if (images_file.is_open()) {
-        images_file << "\t" << "GPS LON" << "\t" << "GPS LAT" << "\t" << "GPS ALT"
-                    << "\t" << "RTK LON" << "\t" << "RTK LAT" << "\t" << "RTK ALT"
-                    << "\t" << "DJI IMU R" << "\t" << "DJI IMU P" << "\t" << "DJI IMU Y"
-                    << "\t" << "ZED2 IMU R" << "\t" << "ZED2 IMU P" << "\t" << "ZED2 IMU Y" << "\n";
+        images_file << "\t" << "GPS_LON" << "\t" << "GPS_LAT" << "\t" << "GPS_ALT"
+                    << "\t" << "RTK_LON" << "\t" << "RTK_LAT" << "\t" << "RTK_ALT"
+                    << "\t" << "GIMBAL_R" << "\t" << "GIMBAL_P" << "\t" << "GIMBAL_Y"
+                    << "\t" << "DJI_IMU_R" << "\t" << "DJI_IMU_P" << "\t" << "DJI_IMU_Y"
+                    << "\t" << "ZED2_IMU_R" << "\t" << "ZED2_IMU_P" << "\t" << "ZED2_IMU_Y" << "\n";
 
     }
     take_photo = nh.serviceClient<dji_sdk::CameraAction>("/dji_sdk/camera_action");
@@ -109,19 +112,20 @@ int main(int argc, char **argv) {
     message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 1);
     message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 1);
     message_filters::Subscriber<sensor_msgs::NavSatFix> gps_sub(nh, "/dji_sdk/gps_position", 1);
+    message_filters::Subscriber<geometry_msgs::Vector3Stamped> gimbal_sub(nh, "/dji_sdk/gimbal_angles", 1);
     message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_sub(nh, "/dji_sdk/rtk_position", 1);
     message_filters::Subscriber<sensor_msgs::Imu> zed_imu_sub(nh, "/zed2/zed_node/imu/data", 1);
     message_filters::Subscriber<sensor_msgs::Imu> dji_imu_sub(nh, "/dji_sdk/imu", 1);
 
 
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image,
-            sensor_msgs::NavSatFix, sensor_msgs::NavSatFix,
+            geometry_msgs::Vector3Stamped, sensor_msgs::NavSatFix, sensor_msgs::NavSatFix,
             sensor_msgs::Imu, sensor_msgs::Imu> MySyncPolicy;
     // ExactTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
     message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L,
-                                                     gps_sub, rtk_sub,
+                                                     gimbal_sub, gps_sub, rtk_sub,
                                                      zed_imu_sub, dji_imu_sub);
-    sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5, _6));
+    sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5, _6, _7));
     while (ros::ok()) {
         ros::spinOnce();
     }

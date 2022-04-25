@@ -29,7 +29,7 @@ std::string decimal(int r);
 
 static std::ofstream images_file;
 
-void callback(const sensor_msgs::CompressedImageConstPtr &image_R,
+void callback(const sensor_msgs::ImageConstPtr &image_R,
               const sensor_msgs::ImageConstPtr &image_L,
               const sensor_msgs::NavSatFixConstPtr &pose_GPS,
               const sensor_msgs::NavSatFixConstPtr &pose_RTK) {
@@ -59,7 +59,7 @@ void callback(const sensor_msgs::CompressedImageConstPtr &image_R,
     std::stringstream writeR;
     std::stringstream writeL;
 
-    writeR << "zed_R" << counter << "."<< image_R->format;
+    writeR << "zed_R" << counter << ".png";
     writeL << "zed_L" << counter << ".png";
     cv::imwrite(writeR.str(), cv_ptr_R->image);
     cv::imwrite(writeL.str(), cv_ptr_L->image);
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "stereo_thread");
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::CompressedImage> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color/compressed", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 1);
     message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 1);
     message_filters::Subscriber<sensor_msgs::NavSatFix> gps_pose(nh, "/dji_sdk/gps_position", 1);
     message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 1);
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
     images_file.open("stereo_images.txt");
 
 
-    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::CompressedImage, sensor_msgs::Image, sensor_msgs::NavSatFix, sensor_msgs::NavSatFix> MySyncPolicy;
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::NavSatFix, sensor_msgs::NavSatFix> MySyncPolicy;
     // ExactTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
     message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L, gps_pose, rtk_pose);
     sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
