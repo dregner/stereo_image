@@ -12,6 +12,7 @@
 #include <dji_sdk/CameraAction.h>
 #include <geometry_msgs/Vector3Stamped.h>
 
+#define DEG2RAD(DEG) ((DEG) * M_PI / 180)
 
 static int counter = 1;
 
@@ -73,7 +74,7 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
             images_file << counter
                         << "\t" << gps->longitude << "\t" << gps->latitude << "\t" << gps->altitude
                         << "\t" << rtk->longitude << "\t" << rtk->latitude << "\t" << rtk->altitude
-                        << "\t" << gimbal->vector.y << "\t" << gimbal->vector.x << "\t" << gimbal->vector.z
+                        << "\t" << DEG2RAD(gimbal->vector.y) << "\t" << DEG2RAD(gimbal->vector.x) << "\t" << DEG2RAD(gimbal->vector.z)
                         << "\t" << dji_imu_eu.Roll() << "\t" << dji_imu_eu.Pitch() << "\t" << dji_imu_eu.Yaw()
                         << "\t" << zed_imu_eu.Roll() << "\t" << zed_imu_eu.Pitch() << "\t" << zed_imu_eu.Yaw() << "\n";
         }
