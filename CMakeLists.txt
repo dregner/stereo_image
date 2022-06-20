@@ -29,7 +29,7 @@ endif()
 
 find_package(OpenCV 3 REQUIRED)
 if (OpenCV_FOUND)
-    message(STATUS "Found OpenCV ${OpenCV_VERSION} installed in the system, will use it for depth perception sample")
+    message(STATUS "Found OpenCV ${OpenCV_VERSION} installed in the system")
     message(STATUS " - Includes: ${OpenCV_INCLUDE_DIRS}")
     include_directories( ${OpenCV_INCLUDE_DIRS})
 endif()

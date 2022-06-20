@@ -8,6 +8,7 @@
 #include <fstream>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/CompressedImage.h>
+#include <geometry_msgs/QuaternionStamped.h>
 
 /// Variavel para leitura GPS RTK
 
@@ -32,15 +33,13 @@ static std::ofstream images_file;
 void callback(const sensor_msgs::ImageConstPtr &image_R,
               const sensor_msgs::ImageConstPtr &image_L,
               const sensor_msgs::NavSatFixConstPtr &pose_GPS,
-              const sensor_msgs::NavSatFixConstPtr &pose_RTK) {
+              const geometry_msgs::QuaternionStampedConstPtr &atti) {
 
     long_GPS = pose_GPS->longitude;
     lat_GPS = pose_GPS->latitude;
     alt_GPS = pose_GPS->altitude;
 
-    long_RTK = pose_RTK->longitude;
-    lat_RTK = pose_RTK->latitude;
-    alt_RTK = pose_RTK->altitude;
+
 
     cv_bridge::CvImagePtr cv_ptr_R;
     cv_bridge::CvImagePtr cv_ptr_L;
@@ -65,16 +64,17 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
     cv::imwrite(writeL.str(), cv_ptr_L->image);
     if (images_file.is_open()) {
         images_file << writeR.str() << "\t" << writeL.str()
-                    << "\t" << long_GPS << "\t" << lat_GPS << "\t" << alt_GPS
-                    << "\t" << long_RTK << "\t" << lat_RTK << "\t" << alt_RTK <<  "\n";
+                    << "\t" << std::setprecision(10) << long_GPS << "\t" << std::setprecision(10) << lat_GPS << "\t" << std::setprecision(10) << alt_GPS
+                    << "\t" << atti->quaternion.w << "\t" << atti->quaternion.x << "\t" << atti->quaternion.y << "\t" << atti->quaternion.z
+                    <<"\n";
     }
     ++counter;
 
 
-    std::cerr << "\n Saved Imgs:  [" <<  writeR.str() << "] [" << writeL.str() << "]\n";
-    //std::cerr << "\n Saved Img:  [" <<  writeL.str() << "]\n";
-    ROS_INFO("GPS: %f %f %f", long_GPS, lat_GPS, alt_GPS);
-    ROS_INFO("RTK: %f %f %f", long_RTK, lat_RTK, alt_RTK);
+//    std::cerr << "\n Saved Imgs:  [" <<  writeR.str() << "] [" << writeL.str() << "]\n";
+//    //std::cerr << "\n Saved Img:  [" <<  writeL.str() << "]\n";
+//    ROS_INFO("GPS: %f %f %f", long_GPS, lat_GPS, alt_GPS);
+//    ROS_INFO("RTK: %f %f %f", long_RTK, lat_RTK, alt_RTK);
     sleep(5);
 
 }
@@ -84,18 +84,20 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "stereo_thread");
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 1);
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 1);
-    message_filters::Subscriber<sensor_msgs::NavSatFix> gps_pose(nh, "/dji_sdk/gps_position", 1);
-    message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 10);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 10);
+    message_filters::Subscriber<sensor_msgs::NavSatFix> gps_pose(nh, "/dji_sdk/gps_position", 100);
+    message_filters::Subscriber<geometry_msgs::QuaternionStamped> atti_sub(nh, "/dji_sdk/attitude", 100);
+
+//    message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 1);
 
     images_file.open("stereo_images.txt");
 
 
-    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::NavSatFix, sensor_msgs::NavSatFix> MySyncPolicy;
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::NavSatFix, geometry_msgs::QuaternionStamped> MySyncPolicy;
     // ExactTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
-    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L, gps_pose, rtk_pose);
-    sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(1000), image_sub_R, image_sub_L, gps_pose, atti_sub);
+    sync.registerCallback(boost::bind(&callback, _1, _2, _3,_4));
 
     while(ros::ok()) {
         ros::spinOnce();

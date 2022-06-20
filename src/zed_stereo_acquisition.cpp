@@ -106,19 +106,19 @@ int main(int argc, char **argv) {
     }
     take_photo = nh.serviceClient<dji_sdk::CameraAction>("/dji_sdk/camera_action");
 
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 1);
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 1);
-    message_filters::Subscriber<sensor_msgs::NavSatFix> gps_sub(nh, "/dji_sdk/gps_position", 1);
-    message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_sub(nh, "/dji_sdk/rtk_position", 1);
-    message_filters::Subscriber<sensor_msgs::Imu> zed_imu_sub(nh, "/zed2/zed_node/imu/data", 1);
-    message_filters::Subscriber<sensor_msgs::Imu> dji_imu_sub(nh, "/dji_sdk/imu", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 10);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 10);
+    message_filters::Subscriber<sensor_msgs::NavSatFix> gps_sub(nh, "/dji_sdk/gps_position", 10);
+    message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_sub(nh, "/dji_sdk/rtk_position", 10);
+    message_filters::Subscriber<sensor_msgs::Imu> zed_imu_sub(nh, "/zed2/zed_node/imu/data", 10);
+    message_filters::Subscriber<sensor_msgs::Imu> dji_imu_sub(nh, "/dji_sdk/imu", 10);
 
 
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image,
             sensor_msgs::NavSatFix, sensor_msgs::NavSatFix,
             sensor_msgs::Imu, sensor_msgs::Imu> MySyncPolicy;
     // ExactTime takes a queue size as its constructor argument, hence MySyncPolicy(10)
-    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(100), image_sub_R, image_sub_L,
+    message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(100000), image_sub_R, image_sub_L,
                                                      gps_sub, rtk_sub,
                                                      zed_imu_sub, dji_imu_sub);
     sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5, _6));
