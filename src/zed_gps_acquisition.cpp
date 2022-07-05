@@ -69,19 +69,11 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
                     <<"\n";
     }
     ++counter;
-
-
-//    std::cerr << "\n Saved Imgs:  [" <<  writeR.str() << "] [" << writeL.str() << "]\n";
-//    //std::cerr << "\n Saved Img:  [" <<  writeL.str() << "]\n";
-//    ROS_INFO("GPS: %f %f %f", long_GPS, lat_GPS, alt_GPS);
-//    ROS_INFO("RTK: %f %f %f", long_RTK, lat_RTK, alt_RTK);
-    sleep(5);
-
 }
 
 int main(int argc, char **argv) {
 
-    ros::init(argc, argv, "stereo_thread");
+    ros::init(argc, argv, "zed_node");
     ros::NodeHandle nh;
 
     message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 10);
@@ -91,7 +83,7 @@ int main(int argc, char **argv) {
 
 //    message_filters::Subscriber<sensor_msgs::NavSatFix> rtk_pose(nh, "/dji_sdk/rtk_position", 1);
 
-    images_file.open("stereo_images.txt");
+    images_file.open("zed_stereo.txt");
 
 
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image, sensor_msgs::NavSatFix, geometry_msgs::QuaternionStamped> MySyncPolicy;
