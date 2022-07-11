@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 project(stereo_image)
 
 #Adicionando os plugins ROS
-
 include_directories(${roscpp_INCLUDE_DIRS})
 include_directories(${std_msgs_INCLUDE_DIRS})
 
@@ -18,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 
         )
 find_package(DJIOSDK REQUIRED)
-#set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 14)
 find_package(darknet_ros QUIET)
 if(darknet_ros_FOUND)
@@ -27,11 +26,20 @@ if(darknet_ros_FOUND)
 endif()
 
 
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV 3.3 REQUIRED)
 if (OpenCV_FOUND)
     message(STATUS "Found OpenCV ${OpenCV_VERSION} installed in the system")
+
+    FILE(GLOB STEREO_UTILITY_SRC_FILE
+            src/stereo_utility/camera_param.cpp
+            src/stereo_utility/stereo_frame.cpp
+            src/stereo_utility/config.cpp)
+
     message(STATUS " - Includes: ${OpenCV_INCLUDE_DIRS}")
     include_directories( ${OpenCV_INCLUDE_DIRS})
+    add_definitions(-DOPEN_CV_INSTALLED)
+    add_definitions(-DUSE_OPEN_CV_CONTRIB)
+
 endif()
 
 
@@ -39,7 +47,7 @@ find_package(CUDA QUIET)
 if(CUDA_FOUND)
     message(STATUS "Found ${CUDA_VERSION} CUDA installed in the system, will use it for depth perception sample")
     message(STATUS " - Includes: ${CUDA_INCLUDE_DIRS}")
-    add_definitions(-DUSE_GPU)
+#    add_definitions(-DUSE_GPU)
 elseif()
     message(STATUS "Did not find CUDA in the system")
 endif()
@@ -87,6 +95,9 @@ target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES} ignition-math4::igniti
 add_executable(show_image src/show_stereo.cpp)
 target_link_libraries(show_image ${OpenCV_LIBS})
 
+add_executable(vga_depth src/stereo_depth_vga.cpp)
+target_link_libraries(vga_depth ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
 
 add_executable(save_image src/stereo_acquisition.cpp)
 target_link_libraries(save_image ${catkin_LIBRARIES} )
@@ -108,3 +119,13 @@ target_link_libraries(zed_stereo ${catkin_LIBRARIES} ignition-math4::ignition-ma
 
 add_executable(save_cameras src/zed_gimbal_image.cpp)
 target_link_libraries(save_cameras ${catkin_LIBRARIES} ignition-math4::ignition-math4)
+
+add_executable(m210_stereo_depth
+        src/m210_stereo_vga.cpp
+        ${STEREO_UTILITY_SRC_FILE} )
+target_link_libraries(m210_stereo_depth
+        ${catkin_LIBRARIES}
+        ${DJIOSDK_LIBRARIES}
+        ${OpenCV_LIBS}
+        )
+add_dependencies(m210_stereo_depth dji_sdk_generate_messages_cpp)
