@@ -9,7 +9,7 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/Imu.h>
 #include <ignition/math/Pose3.hh>
-#include <dji_sdk/CameraAction.h>
+#include <dji_osdk_ros/CameraAction.h>
 
 
 
@@ -23,7 +23,7 @@ static std::ofstream images_file;
 ros::ServiceClient take_photo;
 
 bool dji_takePicture() {
-    dji_sdk::CameraAction cameraAction;
+    dji_osdk_ros::CameraAction cameraAction;
     cameraAction.request.camera_action = 0;
     take_photo.call(cameraAction);
     return cameraAction.response.result;
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
                     << "\t" << "ZED2 IMU R" << "\t" << "ZED2 IMU P" << "\t" << "ZED2 IMU Y" << "\n";
 
     }
-    take_photo = nh.serviceClient<dji_sdk::CameraAction>("/dji_sdk/camera_action");
+    take_photo = nh.serviceClient<dji_osdk_ros::CameraAction>("/dji_sdk/camera_action");
 
     message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/zed2/zed_node/right/image_rect_color", 10);
     message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/zed2/zed_node/left/image_rect_color", 10);

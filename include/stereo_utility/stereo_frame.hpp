@@ -5,16 +5,7 @@
 #include <opencv2/opencv.hpp>
 #include "frame.hpp"
 #include "camera_param.hpp"
-
-#ifdef USE_GPU
-#include <opencv2/cudastereo.hpp>
-#include <opencv2/cudawarping.hpp>
-#endif
-
-#ifdef USE_OPEN_CV_CONTRIB
 #include <opencv2/ximgproc/disparity_filter.hpp>
-#endif
-
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/point_cloud2_iterator.h"
 #include "visualization_msgs/MarkerArray.h"

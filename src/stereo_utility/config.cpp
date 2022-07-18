@@ -1,14 +1,13 @@
 #include "stereo_utility/config.hpp"
 
-using namespace M210_STEREO;
 
-Config* Config::single_instance_ = NULL;
+M210_STEREO::Config* M210_STEREO::Config::single_instance_ = NULL;
 
-Config::Config()
+M210_STEREO::Config::Config()
 {
 }
 
-Config::~Config()
+M210_STEREO::Config::~Config()
 {
   if (file_.isOpened())
   {
@@ -16,20 +15,19 @@ Config::~Config()
   }
 }
 
-Config&
-Config::instance()
+M210_STEREO::Config&
+M210_STEREO::Config::instance()
 {
   return *Config::single_instance_;
 }
 
-Config*
-Config::instancePtr()
+M210_STEREO::Config*
+M210_STEREO::Config::instancePtr()
 {
   return Config::single_instance_;
 }
 
-void
-Config::setParamFile(const std::string& file_name)
+void M210_STEREO::Config::setParamFile(const std::string& file_name)
 {
   if(!Config::single_instance_)
   {

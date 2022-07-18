@@ -10,11 +10,10 @@ dji_sdk::StereoVGASubscription subscription;
 ros::Publisher rect_img_left_publisher;
 ros::Publisher rect_img_right_publisher;
 ros::Publisher left_disparity_publisher;
-ros::Publisher point_cloud_publisher;
 
 int
 main(int argc, char **argv) {
-    ros::init(argc, argv, "demo_advanced_sensing_depth_perception");
+    ros::init(argc, argv, "m210_stereo_perception");
     ros::NodeHandle nh;
 
     std::string yaml_file_path = "/home/vant3d/m210_stereo_param.yaml";
@@ -44,8 +43,7 @@ main(int argc, char **argv) {
             nh.advertise<sensor_msgs::Image>("/stereo_depth_perception/rectified_vga_front_right_image", 10);
     left_disparity_publisher =
             nh.advertise<sensor_msgs::Image>("/stereo_depth_perception/disparity_front_left_image", 10);
-    point_cloud_publisher =
-            nh.advertise<sensor_msgs::PointCloud2>("/stereo_depth_perception/unprojected_pt_cloud", 10);
+
 
     img_left_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
     img_right_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
@@ -73,8 +71,6 @@ main(int argc, char **argv) {
 void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &img_left,
                                             const sensor_msgs::ImageConstPtr &img_right,
                                             StereoFrame::Ptr stereo_frame_ptr) {
-#ifdef USE_OPEN_CV_CONTRIB
-
     //! Read raw images
     stereo_frame_ptr->readStereoImgs(img_left, img_right);
 
@@ -126,9 +122,7 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
              rectify_time_diff.count() * 1000.0,
              disp_time_diff.count() * 1000.0,
              filter_diff.count() * 1000.0);
-#else
-    ROS_INFO("openCV contrib is not enabled in CMakeLists. It's required for disparity map filtering");
-#endif
+
 
 }
 

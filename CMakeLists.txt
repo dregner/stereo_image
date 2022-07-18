@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
         cv_bridge
         image_transport
         geometry_msgs
-        dji_sdk
+        dji_osdk_ros
 
         )
 find_package(DJIOSDK REQUIRED)
@@ -62,7 +62,7 @@ catkin_package(
         geometry_msgs
         sensor_msgs
         std_msgs
-        dji_sdk
+        dji_osdk_ros
         stereo_vant
 )
 
@@ -120,12 +120,12 @@ target_link_libraries(zed_stereo ${catkin_LIBRARIES} ignition-math4::ignition-ma
 add_executable(save_cameras src/zed_gimbal_image.cpp)
 target_link_libraries(save_cameras ${catkin_LIBRARIES} ignition-math4::ignition-math4)
 
-add_executable(m210_stereo_depth
-        src/m210_stereo_vga.cpp
-        ${STEREO_UTILITY_SRC_FILE} )
-target_link_libraries(m210_stereo_depth
-        ${catkin_LIBRARIES}
-        ${DJIOSDK_LIBRARIES}
-        ${OpenCV_LIBS}
-        )
-add_dependencies(m210_stereo_depth dji_sdk_generate_messages_cpp)
+#add_executable(m210_stereo_depth
+#        src/m210_stereo_vga.cpp
+#        ${STEREO_UTILITY_SRC_FILE} )
+#target_link_libraries(m210_stereo_depth
+#        ${catkin_LIBRARIES}
+#        ${DJIOSDK_LIBRARIES}
+#        ${OpenCV_LIBS}
+#        )
+#add_dependencies(m210_stereo_depth dji_sdk_generate_messages_cpp)

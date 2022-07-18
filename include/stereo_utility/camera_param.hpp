@@ -14,8 +14,6 @@ public:
   enum POSITION {
     FRONT_LEFT = 0,
     FRONT_RIGHT = 1,
-    DOWN_LEFT = 2,
-    DOWN_RIGHT = 3
   };
 
   typedef std::shared_ptr<CameraParam> Ptr;
