@@ -21,7 +21,7 @@ public:
   typedef std::shared_ptr<StereoFrame> Ptr;
 
   StereoFrame(CameraParam::Ptr left_cam, CameraParam::Ptr right_cam,
-              int num_disp = 64, int block_size = 13);
+              int num_disp = 32, int block_size = 5);
   ~StereoFrame();
 
 public:
