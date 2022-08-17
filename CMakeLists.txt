@@ -102,6 +102,12 @@ target_link_libraries(vga_depth ${catkin_LIBRARIES} ${OpenCV_LIBS})
 add_executable(save_image src/stereo_acquisition.cpp)
 target_link_libraries(save_image ${catkin_LIBRARIES} )
 
+add_executable(save_vga_fpv src/stereo_fpv_acquisition.cpp)
+target_link_libraries(save_vga_fpv ${catkin_LIBRARIES} )
+
+add_executable(show_fpv src/show_stereo_fpv.cpp)
+target_link_libraries(show_fpv ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
 add_executable(save_zed src/zed_stereo_acquisition.cpp)
 target_link_libraries(save_zed ${catkin_LIBRARIES} ignition-math4::ignition-math4)
 
