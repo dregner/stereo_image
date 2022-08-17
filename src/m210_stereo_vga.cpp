@@ -4,15 +4,14 @@ using namespace M210_STEREO;
 
 // for visualization purpose
 bool is_disp_filterd;
-bool vga_imgs_subscribed = false;
 
-dji_sdk::StereoVGASubscription subscription;
+dji_osdk_ros::StereoVGASubscription subscription;
 ros::Publisher rect_img_left_publisher;
 ros::Publisher rect_img_right_publisher;
 ros::Publisher left_disparity_publisher;
 
-int
-main(int argc, char **argv) {
+
+int main(int argc, char **argv) {
     ros::init(argc, argv, "m210_stereo_perception");
     ros::NodeHandle nh;
 
@@ -45,6 +44,8 @@ main(int argc, char **argv) {
             nh.advertise<sensor_msgs::Image>("/stereo_depth_perception/disparity_front_left_image", 10);
 
 
+//    img_left_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_left_images", 1);
+//    img_right_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_right_images", 1);
     img_left_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
     img_right_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
 
@@ -54,11 +55,6 @@ main(int argc, char **argv) {
 
     //! For signal handling, e.g. if user terminate the program with Ctrl+C
     //! this program will unsubscribe the image stream if it's subscribed
-    struct sigaction sigIntHandler;
-    sigIntHandler.sa_handler = shutDownHandler;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-    sigaction(SIGINT, &sigIntHandler, NULL);
 
     topic_synchronizer->registerCallback(boost::bind(&displayStereoFilteredDisparityCallback,
                                                      _1, _2, stereo_frame_ptr));
@@ -151,41 +147,25 @@ visualizeRectImgHelper(StereoFrame::Ptr stereo_frame_ptr) {
 
 void
 visualizeDisparityMapHelper(StereoFrame::Ptr stereo_frame_ptr) {
+    cv::Mat mean, stddev;
     cv::Mat raw_disp_map;
-#ifdef USE_OPEN_CV_CONTRIB
+
     if (is_disp_filterd) {
         raw_disp_map = stereo_frame_ptr->getFilteredDispMap().clone();
     } else {
         raw_disp_map = stereo_frame_ptr->getDisparityMap().clone();
     }
-#else
-    raw_disp_map = stereo_frame_ptr->getDisparityMap().clone();
-#endif
 
     double min_val, max_val;
     cv::minMaxLoc(raw_disp_map, &min_val, &max_val, NULL, NULL);
 
     cv::Mat scaled_disp_map;
-    raw_disp_map.convertTo(scaled_disp_map, CV_8U, 255 / (max_val - min_val), -min_val / (max_val - min_val));
-
+    raw_disp_map.convertTo(scaled_disp_map, CV_8UC1, 255 / (max_val - min_val), -min_val / (max_val - min_val));
+//    cv::meanStdDev(scaled_disp_map,mean, stddev, mask);
     cv::imshow("Scaled disparity map", scaled_disp_map);
 }
 
 bool
-imgSubscriptionHelper(dji_sdk::StereoVGASubscription &service) {
+imgSubscriptionHelper(dji_osdk_ros::StereoVGASubscription &service) {
     return true;
-}
-
-void
-shutDownHandler(int s) {
-    ROS_INFO("Caught signal %d", s);
-
-    if (vga_imgs_subscribed) {
-        cv::destroyAllWindows();
-        sleep(2);
-        subscription.request.unsubscribe_vga = 1;
-        imgSubscriptionHelper(subscription);
-    }
-
-    exit(1);
 }

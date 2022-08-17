@@ -45,6 +45,9 @@ M210_STEREO::StereoFrame::initStereoParam() {
                             rectified_mapping_[1][0], rectified_mapping_[1][1]);
 
     block_matcher_ = cv::StereoBM::create(num_disp_, block_size_);
+//    block_matcher_->setPreFilterCap(1);
+//    block_matcher_->setUniquenessRatio(100);
+//    block_matcher_->setSpeckleRange(0);
 
 
     wls_filter_ = cv::ximgproc::createDisparityWLSFilter(block_matcher_); // left_matcher
@@ -89,8 +92,11 @@ void M210_STEREO::StereoFrame::computeDisparityMap() {
     //! CPU implementation of stereoBM outputs short int, i.e. CV_16S
     block_matcher_->compute(rectified_img_left_, rectified_img_right_, raw_disparity_map_);
 
-    raw_disparity_map_.convertTo(disparity_map_8u_, CV_8UC1, 0.0625);
+    raw_disparity_map_.convertTo(disparity_map_8u_, CV_8UC1, 0.06); //! 0.0625
 
+    // convert it from CV_8U to CV_16U for unified
+    // calculation in filterDisparityMap() & unprojectPtCloud()
+//    raw_disparity_map_.convertTo(raw_disparity_map_, CV_16S, 8);
 }
 
 void M210_STEREO::StereoFrame::filterDisparityMap() {
@@ -102,6 +108,6 @@ void M210_STEREO::StereoFrame::filterDisparityMap() {
                         filtered_disparity_map_,
                         raw_right_disparity_map_);
 
-    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.0625);
+    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.06);
 
 }
