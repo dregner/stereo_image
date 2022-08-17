@@ -82,24 +82,24 @@ endforeach(dir)
 
 ######### READ SENSORS DJI #################
 
-add_executable(read_attitude src/read_attitude.cpp)
+add_executable(read_attitude src/sensor/read_attitude.cpp)
 target_link_libraries(read_attitude ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
-add_executable(read_imu src/read_imu.cpp)
+add_executable(read_imu src/sensor/read_imu.cpp)
 target_link_libraries(read_imu ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
 
-add_executable(read_imu_gimbal src/read_gimbal_imu.cpp)
+add_executable(read_imu_gimbal src/sensor/read_gimbal_imu.cpp)
 target_link_libraries(read_imu_gimbal ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
-add_executable(show_image src/show_stereo.cpp)
+add_executable(show_image src/stereo/show_stereo.cpp)
 target_link_libraries(show_image ${OpenCV_LIBS})
 
-add_executable(vga_depth src/stereo_depth_vga.cpp)
+add_executable(vga_depth src/stereo/stereo_depth_vga.cpp)
 target_link_libraries(vga_depth ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 
-add_executable(save_image src/stereo_acquisition.cpp)
+add_executable(save_image src/stereo/stereo_acquisition.cpp)
 target_link_libraries(save_image ${catkin_LIBRARIES} )
 
 add_executable(save_vga_fpv src/stereo_fpv_acquisition.cpp)
@@ -108,42 +108,23 @@ target_link_libraries(save_vga_fpv ${catkin_LIBRARIES} )
 add_executable(show_fpv src/show_stereo_fpv.cpp)
 target_link_libraries(show_fpv ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-add_executable(save_zed src/zed_stereo_acquisition.cpp)
+add_executable(save_zed src/zed/zed_stereo_acquisition.cpp)
 target_link_libraries(save_zed ${catkin_LIBRARIES} ignition-math4::ignition-math4)
 
-add_executable(calib_stereo src/calib_stereo.cpp)
+add_executable(calib_stereo src/stereo/calib_stereo.cpp)
 target_link_libraries(calib_stereo  ${OpenCV_LIBS})
 
-add_executable(save_gps_image src/stereo_gps_acquisition.cpp)
+add_executable(camera_calib src/stereo/camera_calib.cpp)
+target_link_libraries(camera_calib  ${OpenCV_LIBS})
+
+add_executable(save_gps_image src/stereo/stereo_gps_acquisition.cpp)
 target_link_libraries(save_gps_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
-add_executable(save_gps_imu_image src/stereo_gps_imu_acquisition.cpp)
+add_executable(save_gps_imu_image src/stereo/stereo_gps_imu_acquisition.cpp)
 target_link_libraries(save_gps_imu_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
-add_executable(zed_stereo src/zed_gps_acquisition.cpp)
+add_executable(zed_stereo src/zed/zed_gps_acquisition.cpp)
 target_link_libraries(zed_stereo ${catkin_LIBRARIES} ignition-math4::ignition-math4)
 
-add_executable(save_cameras src/zed_gimbal_image.cpp)
+add_executable(save_cameras src/zed/zed_gimbal_image.cpp)
 target_link_libraries(save_cameras ${catkin_LIBRARIES} ignition-math4::ignition-math4)
-
-<<<<<<< HEAD
-#add_executable(m210_stereo_depth
-#        src/m210_stereo_vga.cpp
-#        ${STEREO_UTILITY_SRC_FILE} )
-#target_link_libraries(m210_stereo_depth
-#        ${catkin_LIBRARIES}
-#        ${DJIOSDK_LIBRARIES}
-#        ${OpenCV_LIBS}
-#        )
-#add_dependencies(m210_stereo_depth dji_sdk_generate_messages_cpp)
-=======
-add_executable(m210_stereo_depth
-        src/m210_stereo_vga.cpp
-        ${STEREO_UTILITY_SRC_FILE} )
-target_link_libraries(m210_stereo_depth
-        ${catkin_LIBRARIES}
-        ${DJIOSDK_LIBRARIES}
-        ${OpenCV_LIBS}
-        )
-#add_dependencies(m210_stereo_depth dji_sdk_generate_messages_cpp)
->>>>>>> 2de110c80f22730c44f69e10b1a3cbd39e4577a0

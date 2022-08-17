@@ -12,7 +12,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 
-int CHECKERBOARD[2]{13,18}; /// Check board dimension starting from 0
+int CHECKERBOARD[2]{9,6}; /// Check board dimension starting from 0
 
 int main(int argc, char** argv)
 {
@@ -33,9 +33,9 @@ int main(int argc, char** argv)
     // Extracting path of individual image stored in a given directory
     std::vector<cv::String> imagesL, imagesR;
     // Path of the folder containing checkerboard images
-    std::string pathL = "/home/regner/Documents/stereo_VGA_calib/1_5m_filtered/left/*.png";
+    std::string pathL = "/home/vant3d/Documents/2022.08.17_calib_vga_fpv/calib2/L/*.png";
 //    std::string pathL = "/home/regner/Documents/stereo_VGA_calib/teste/left/*.png";
-    std::string pathR = "/home/regner/Documents/stereo_VGA_calib/1_5m_filtered/right/*.png";
+    std::string pathR = "/home/vant3d/Documents/2022.08.17_calib_vga_fpv/calib2/R/*.png";
 //    std::string pathR = "/home/regner/Documents/stereo_VGA_calib/teste/right/*.png";
 
     cv::glob(pathL, imagesL);
@@ -121,6 +121,12 @@ int main(int argc, char** argv)
                         R_L,
                         T_L);
 
+    std::cout << "LEFT CAMERA" << std::endl;
+    std::cout << "cameraMatrix : " << mtxL << std::endl;
+    std::cout << "distCoeffs : " << distL << std::endl;
+    std::cout << "Rotation vector : " << R_L << std::endl;
+    std::cout << "Translation vector : " << T_L << std::endl;
+
     new_mtxL = cv::getOptimalNewCameraMatrix(mtxL,
                                              distL,
                                              grayL.size(),
@@ -137,12 +143,20 @@ int main(int argc, char** argv)
                         R_R,
                         T_R);
 
+    std::cout << "RIGHT CAMERA" << std::endl;
+    std::cout << "cameraMatrix : " << mtxR << std::endl;
+    std::cout << "distCoeffs : " << distR << std::endl;
+    std::cout << "Rotation vector : " << R_R << std::endl;
+    std::cout << "Translation vector : " << T_R << std::endl;
+
     new_mtxR = cv::getOptimalNewCameraMatrix(mtxR,
                                              distR,
                                              grayR.size(),
                                              1,
                                              grayR.size(),
                                              0);
+
+
 
     // Here we fix the intrinsic camara matrixes so that only Rot, Trns, Emat and Fmat
     // are calculated. Hence intrinsic parameters are the same.
@@ -169,6 +183,15 @@ int main(int argc, char** argv)
                         flag,
                         cv::TermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 30, 1e-6));
 
+
+    std::cout << "STEREO CAMERA" << std::endl;
+    std::cout << "cameraMatrix L: " << new_mtxL << std::endl;
+    std::cout << "distCoeffs L: " << distL << std::endl;
+    std::cout << "cameraMatrix R: " << new_mtxR << std::endl;
+    std::cout << "distCoeffs R: " << distR << std::endl;
+    std::cout << "Rotation vector : " << Rot << std::endl;
+    std::cout << "Translation vector : " << Trns << std::endl;
+
     cv::Mat rect_l, rect_r, proj_mat_l, proj_mat_r, Q;
 
     // Once we know the transformation between the two cameras we can perform
@@ -187,6 +210,13 @@ int main(int argc, char** argv)
                       Q,
                       1);
 
+    std::cout << "STEREO CAMERA RECT" << std::endl;
+    std::cout << "cameraMatrix L: " << new_mtxL << std::endl;
+    std::cout << "distCoeffs L: " << distL << std::endl;
+    std::cout << "cameraMatrix R: " << new_mtxR << std::endl;
+    std::cout << "distCoeffs R: " << distR << std::endl;
+    std::cout << "Rotation vector : " << Rot << std::endl;
+    std::cout << "Translation vector : " << Trns << std::endl;
     // Use the rotation matrixes for stereo rectification and camera intrinsics for undistorting the image
     // Compute the rectification map (mapping between the original image pixels and
     // their transformed values after applying rectification and undistortion) for left and right camera frames
@@ -211,7 +241,7 @@ int main(int argc, char** argv)
                                 Right_Stereo_Map1,
                                 Right_Stereo_Map2);
 
-    cv::FileStorage cv_file = cv::FileStorage("/home/regner/Documents/learnopencv/stereo-camera/vga_1_5/params_cpp.xml", cv::FileStorage::WRITE);
+    cv::FileStorage cv_file = cv::FileStorage("/home/vant3d/Documents/2022.08.17_calib_vga_fpv/calib2/params_cpp.xml", cv::FileStorage::WRITE);
     cv_file.write("Left_Stereo_Map_x",Left_Stereo_Map1);
     cv_file.write("Left_Stereo_Map_y",Left_Stereo_Map2);
     cv_file.write("Right_Stereo_Map_x",Right_Stereo_Map1);
