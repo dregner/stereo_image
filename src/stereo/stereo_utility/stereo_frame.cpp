@@ -25,10 +25,15 @@ M210_STEREO::StereoFrame::~StereoFrame() {
 
 bool
 M210_STEREO::StereoFrame::initStereoParam() {
-    param_rect_left_ = Config::get<cv::Mat>("leftRectificationMatrix");
+/*    param_rect_left_ = Config::get<cv::Mat>("leftRectificationMatrix");
     param_rect_right_ = Config::get<cv::Mat>("rightRectificationMatrix");
     param_proj_left_ = Config::get<cv::Mat>("leftProjectionMatrix");
-    param_proj_right_ = Config::get<cv::Mat>("rightProjectionMatrix");
+    param_proj_right_ = Config::get<cv::Mat>("rightProjectionMatrix");*/
+    cv::stereoRectify(camera_left_ptr_->getIntrinsic(), camera_left_ptr_->getDistortion(),
+                      camera_right_ptr_->getIntrinsic(), camera_right_ptr_->getDistortion(),
+                      cv::Size(480, 640), R, T, param_rect_left_, param_rect_right_,
+                      param_proj_left_, param_proj_right_, Q, CV_CALIB_ZERO_DISPARITY, -1,
+                      cv::Size(0, 0));
 
 
     initUndistortRectifyMap(camera_left_ptr_->getIntrinsic(),

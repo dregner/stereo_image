@@ -71,7 +71,9 @@ protected:
   //! Rectified images
   cv::Mat rectified_img_left_;
   cv::Mat rectified_img_right_;
-
+  cv::Mat R = (cv::Mat_<double>(3,3) << 0.999969, -0.004767,0.006283, -0.004779, 0.999987,0.001786, -0.006275, -0.001816,0.999979);
+  cv::Mat T = (cv::Mat_<double>(3,1) << -112.8730, -0.2326, 0.0152);
+  cv::Mat Q;
   //! Block matching related
   int num_disp_;
   int block_size_;

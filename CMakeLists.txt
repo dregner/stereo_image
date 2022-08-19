@@ -31,9 +31,9 @@ if (OpenCV_FOUND)
     message(STATUS "Found OpenCV ${OpenCV_VERSION} installed in the system")
 
     FILE(GLOB STEREO_UTILITY_SRC_FILE
-            src/stereo_utility/camera_param.cpp
-            src/stereo_utility/stereo_frame.cpp
-            src/stereo_utility/config.cpp)
+            src/stereo/stereo_utility/camera_param.cpp
+            src/stereo/stereo_utility/stereo_frame.cpp
+            src/stereo/stereo_utility/config.cpp)
 
     message(STATUS " - Includes: ${OpenCV_INCLUDE_DIRS}")
     include_directories( ${OpenCV_INCLUDE_DIRS})
