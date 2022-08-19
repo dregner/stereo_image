@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "m210_stereo_perception");
     ros::NodeHandle nh;
 
-    std::string yaml_file_path = "/home/vant3d/m210_stereo_param.yaml";
+    std::string yaml_file_path = "/home/vant3d/Documents/calib3/m210_stereo_calib.yaml";
     Config::setParamFile(yaml_file_path);
 
     //! Instantiate some relevant objects
@@ -44,10 +44,10 @@ int main(int argc, char **argv) {
             nh.advertise<sensor_msgs::Image>("/stereo_depth_perception/disparity_front_left_image", 10);
 
 
-//    img_left_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_left_images", 1);
-//    img_right_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_right_images", 1);
-    img_left_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
-    img_right_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
+    img_left_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_left_images", 1);
+    img_right_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_right_images", 1);
+//    img_left_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
+//    img_right_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
 
     topic_synchronizer = new message_filters::TimeSynchronizer
             <sensor_msgs::Image, sensor_msgs::Image>(img_left_sub, img_right_sub, 10);
@@ -83,7 +83,7 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
     //! Filter disparity map
     timer filter_start = std::chrono::high_resolution_clock::now();
     stereo_frame_ptr->filterDisparityMap();
-    is_disp_filterd = true;
+    is_disp_filterd = false;
     timer filter_end = std::chrono::high_resolution_clock::now();
 
     visualizeRectImgHelper(stereo_frame_ptr);
@@ -141,7 +141,6 @@ visualizeRectImgHelper(StereoFrame::Ptr stereo_frame_ptr) {
              cv::Point(img_to_show.cols, j),
              cv::Scalar(255, 0, 0, 255), 1, 8);
     }
-
     cv::imshow("Rectified Stereo Imgs with epipolar lines", img_to_show);
 }
 
@@ -160,8 +159,10 @@ visualizeDisparityMapHelper(StereoFrame::Ptr stereo_frame_ptr) {
     cv::minMaxLoc(raw_disp_map, &min_val, &max_val, NULL, NULL);
 
     cv::Mat scaled_disp_map;
-    raw_disp_map.convertTo(scaled_disp_map, CV_8UC1, 255 / (max_val - min_val), -min_val / (max_val - min_val));
+    raw_disp_map.convertTo(scaled_disp_map, CV_8U, 255 / (max_val - min_val), -min_val / (max_val - min_val));
 //    cv::meanStdDev(scaled_disp_map,mean, stddev, mask);
+//    cv::bitwise_not(scaled_disp_map, scaled_disp_map);
+
     cv::imshow("Scaled disparity map", scaled_disp_map);
 }
 

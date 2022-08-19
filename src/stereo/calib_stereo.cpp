@@ -33,9 +33,9 @@ int main(int argc, char** argv)
     // Extracting path of individual image stored in a given directory
     std::vector<cv::String> imagesL, imagesR;
     // Path of the folder containing checkerboard images
-    std::string pathL = "/home/vant3d/Documents/2022.08.17_calib_vga_fpv/calib2/L/*.png";
+    std::string pathL = "/home/vant3d/Documents/calib3/L/*.png";
 //    std::string pathL = "/home/regner/Documents/stereo_VGA_calib/teste/left/*.png";
-    std::string pathR = "/home/vant3d/Documents/2022.08.17_calib_vga_fpv/calib2/R/*.png";
+    std::string pathR = "/home/vant3d/Documents/calib3/R/*.png";
 //    std::string pathR = "/home/regner/Documents/stereo_VGA_calib/teste/right/*.png";
 
     cv::glob(pathL, imagesL);

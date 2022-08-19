@@ -32,6 +32,4 @@ void visualizeDisparityMapHelper(M210_STEREO::StereoFrame::Ptr stereo_frame_ptr)
 
 bool imgSubscriptionHelper(dji_osdk_ros::StereoVGASubscription &service);
 
-void shutDownHandler(int s);
-
 #endif //DEMO_ADVANCED_SENSING_DEPTH_PERCEPTION_H

@@ -31,7 +31,7 @@ int main()
     // Extracting path of individual image stored in a given directory
     std::vector<cv::String> images;
     // Path of the folder containing checkerboard images
-    std::string path = "/home/vant3d/Documents/2022.08.17_calib_vga_fpv/calib2/fpv/*.png";
+    std::string path = "/home/vant3d/Documents/calib3/FPV/*.png";
 
     cv::glob(path, images);
 
@@ -44,7 +44,7 @@ int main()
     for(int i{0}; i<images.size(); i++)
     {
         frame = cv::imread(images[i]);
-        cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
+        cv::cvtColor(frame,gray,cv::COLOR_RGB2GRAY);
 
         // Finding checker board corners
         // If desired number of corners are found in the image then success = true
