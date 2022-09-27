@@ -98,9 +98,11 @@ target_link_libraries(show_image ${OpenCV_LIBS})
 add_executable(vga_depth src/stereo/stereo_depth_vga.cpp)
 target_link_libraries(vga_depth ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-
 add_executable(save_image src/stereo/stereo_acquisition.cpp)
 target_link_libraries(save_image ${catkin_LIBRARIES} )
+
+add_executable(camera_save src/sensor/save_image.cpp)
+target_link_libraries(camera_save ${catkin_LIBRARIES} )
 
 add_executable(save_vga_fpv src/stereo_fpv_acquisition.cpp)
 target_link_libraries(save_vga_fpv ${catkin_LIBRARIES} )

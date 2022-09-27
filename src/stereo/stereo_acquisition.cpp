@@ -61,10 +61,11 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
     cv::imwrite(writeR.str(), cv_ptr_R->image);
     std::cout << "Aqcuired Image -" << counter << std::endl;
 
-    std::cout << "Press Enter to Continue";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+//    std::cout << "Press Enter to Continue";
+//    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
 
     ++counter;
+    ros::Duration(2).sleep();
 }
 
 int main(int argc, char **argv) {
