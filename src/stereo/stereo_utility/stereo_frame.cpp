@@ -25,16 +25,18 @@ M210_STEREO::StereoFrame::~StereoFrame() {
 
 bool
 M210_STEREO::StereoFrame::initStereoParam() {
-/*    param_rect_left_ = Config::get<cv::Mat>("leftRectificationMatrix");
-    param_rect_right_ = Config::get<cv::Mat>("rightRectificationMatrix");
-    param_proj_left_ = Config::get<cv::Mat>("leftProjectionMatrix");
-    param_proj_right_ = Config::get<cv::Mat>("rightProjectionMatrix");*/
+//    param_rect_left_ = Config::get<cv::Mat>("leftRectificationMatrix");
+//    param_rect_right_ = Config::get<cv::Mat>("rightRectificationMatrix");
+//    param_proj_left_ = Config::get<cv::Mat>("leftProjectionMatrix");
+//    param_proj_right_ = Config::get<cv::Mat>("rightProjectionMatrix");
+    param_rot_stereo_ = Config::get<cv::Mat>("stereoRotationMatrix");
+    param_tran_stereo_ = Config::get<cv::Mat>("stereoTransVector");
+    cv::Mat Q;
     cv::stereoRectify(camera_left_ptr_->getIntrinsic(), camera_left_ptr_->getDistortion(),
                       camera_right_ptr_->getIntrinsic(), camera_right_ptr_->getDistortion(),
-                      cv::Size(480, 640), R, T, param_rect_left_, param_rect_right_,
-                      param_proj_left_, param_proj_right_, Q, CV_CALIB_ZERO_DISPARITY, -1,
+                      cv::Size(VGA_WIDTH, VGA_HEIGHT), param_rot_stereo_, param_tran_stereo_, param_rect_left_,
+                      param_rect_right_, param_proj_left_, param_proj_right_, Q, CV_CALIB_ZERO_DISPARITY, -1,
                       cv::Size(0, 0));
-
 
     initUndistortRectifyMap(camera_left_ptr_->getIntrinsic(),
                             camera_left_ptr_->getDistortion(),
@@ -51,15 +53,15 @@ M210_STEREO::StereoFrame::initStereoParam() {
 
     block_matcher_ = cv::StereoBM::create();
     block_matcher_->setNumDisparities(16);
-    block_matcher_->setBlockSize(13);
+    block_matcher_->setBlockSize(19);
     block_matcher_->setPreFilterType(1);
-    block_matcher_->setPreFilterSize(7);
+    block_matcher_->setPreFilterSize(17);
     block_matcher_->setPreFilterCap(57);
     block_matcher_->setTextureThreshold(0);
     block_matcher_->setUniquenessRatio(50);
-    block_matcher_->setSpeckleRange(0);
-    block_matcher_->setSpeckleWindowSize(0);
-    block_matcher_->setDisp12MaxDiff(-1);
+    block_matcher_->setSpeckleRange(44);
+    block_matcher_->setSpeckleWindowSize(25);
+    block_matcher_->setDisp12MaxDiff(0);
 
 
     wls_filter_ = cv::ximgproc::createDisparityWLSFilter(block_matcher_); // left_matcher
@@ -104,11 +106,9 @@ void M210_STEREO::StereoFrame::computeDisparityMap() {
     //! CPU implementation of stereoBM outputs short int, i.e. CV_16S
     block_matcher_->compute(rectified_img_left_, rectified_img_right_, raw_disparity_map_);
 
-    raw_disparity_map_.convertTo(disparity_map_8u_, CV_8U, 0.06); //! 0.0625
+    raw_disparity_map_.convertTo(disparity_map_8u_, CV_32F, 1); //! 0.0625
 
-    // convert it from CV_8U to CV_16U for unified
-    // calculation in filterDisparityMap() & unprojectPtCloud()
-//    raw_disparity_map_.convertTo(raw_disparity_map_, CV_16S, 8);
+
 }
 
 void M210_STEREO::StereoFrame::filterDisparityMap() {
@@ -123,3 +123,5 @@ void M210_STEREO::StereoFrame::filterDisparityMap() {
     filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.06);
 
 }
+
+

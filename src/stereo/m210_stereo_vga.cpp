@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "m210_stereo_perception");
     ros::NodeHandle nh;
 
-    std::string yaml_file_path = "/home/vant3d/Documents/calib3/m210_stereo_calib.yaml";
+    std::string yaml_file_path = "/home/vant3d/catkin_ws/src/stereo_image/config/tb_matlab_m210_stereo_calib.yaml";
     Config::setParamFile(yaml_file_path);
 
     //! Instantiate some relevant objects
@@ -46,8 +46,6 @@ int main(int argc, char **argv) {
 
     img_left_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_left_images", 1);
     img_right_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_right_images", 1);
-//    img_left_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
-//    img_right_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
 
     topic_synchronizer = new message_filters::TimeSynchronizer
             <sensor_msgs::Image, sensor_msgs::Image>(img_left_sub, img_right_sub, 10);
@@ -159,7 +157,8 @@ visualizeDisparityMapHelper(StereoFrame::Ptr stereo_frame_ptr) {
     cv::minMaxLoc(raw_disp_map, &min_val, &max_val, NULL, NULL);
 
     cv::Mat scaled_disp_map;
-    raw_disp_map.convertTo(scaled_disp_map, CV_8U, 255 / (max_val - min_val), -min_val / (max_val - min_val));
+//    raw_disp_map.convertTo(scaled_disp_map, CV_8U, 255 / (max_val - min_val), -min_val / (max_val - min_val));
+    scaled_disp_map = (raw_disp_map / (float) 16.0 - (float) stereo_frame_ptr->getMinDisparity())/((float) stereo_frame_ptr->getNumDisparities());
 //    cv::meanStdDev(scaled_disp_map,mean, stddev, mask);
 //    cv::bitwise_not(scaled_disp_map, scaled_disp_map);
 

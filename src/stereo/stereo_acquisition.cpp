@@ -72,8 +72,8 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "stereo_thread");
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/dji_osdk_ros/stereo_vga_front_right_images", 1);
-    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/dji_osdk_ros/stereo_vga_front_left_images", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_R(nh, "/stereo/right/image_raw", 1);
+    message_filters::Subscriber<sensor_msgs::Image> image_sub_L(nh, "/stereo/left/image_raw", 1);
 
 
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> MySyncPolicy;
