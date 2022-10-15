@@ -4,7 +4,7 @@ using namespace M210_STEREO;
 
 // for visualization purpose
 bool is_disp_filterd;
-
+int count = 1;
 dji_osdk_ros::StereoVGASubscription subscription;
 ros::Publisher rect_img_left_publisher;
 ros::Publisher rect_img_right_publisher;
@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "m210_stereo_perception");
     ros::NodeHandle nh;
 
-    std::string yaml_file_path = "/home/vant3d/catkin_ws/src/stereo_image/config/tb_matlab_m210_stereo_calib.yaml";
+    std::string yaml_file_path = "/home/vant3d/catkin_ws/src/stereo_image/config/opencv_m210_stereo_calib.yaml";
     Config::setParamFile(yaml_file_path);
 
     //! Instantiate some relevant objects
@@ -23,9 +23,9 @@ int main(int argc, char **argv) {
     CameraParam::Ptr camera_right_ptr;
     StereoFrame::Ptr stereo_frame_ptr;
 
-    message_filters::Subscriber<sensor_msgs::Image> img_left_sub;
-    message_filters::Subscriber<sensor_msgs::Image> img_right_sub;
-    message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> *topic_synchronizer;
+    message_filters::Subscriber <sensor_msgs::Image> img_left_sub;
+    message_filters::Subscriber <sensor_msgs::Image> img_right_sub;
+    message_filters::TimeSynchronizer <sensor_msgs::Image, sensor_msgs::Image> *topic_synchronizer;
 
 
     //! Setup stereo frame
@@ -140,6 +140,22 @@ visualizeRectImgHelper(StereoFrame::Ptr stereo_frame_ptr) {
              cv::Scalar(255, 0, 0, 255), 1, 8);
     }
     cv::imshow("Rectified Stereo Imgs with epipolar lines", img_to_show);
+
+    std::stringstream writeD;
+    writeD <<  "Disparity" << count << ".png";
+    cv::imwrite(writeD.str(), stereo_frame_ptr->getDisparityMap());
+    count++;
+}
+
+cv::Mat average_disparity(cv::Mat &image, int x, int y, int h, int w) {
+    std::vector<cv::Mat> channels;
+    cv::Rect crop(x, y, h, w);
+    cv::Mat img_crop = image(crop);
+    cv::split(img_crop, channels);
+    cv::Scalar m = mean(channels[0]);
+    printf("%f\n", m[0]);
+    cv::putText(image, "Mean Disparity: ", cvPoint(20, 20), CV_FONT_HERSHEY_SIMPLEX, 1, cvScalar(255, 0, 0), 2);
+    return image;
 }
 
 void
@@ -158,14 +174,13 @@ visualizeDisparityMapHelper(StereoFrame::Ptr stereo_frame_ptr) {
 
     cv::Mat scaled_disp_map;
 //    raw_disp_map.convertTo(scaled_disp_map, CV_8U, 255 / (max_val - min_val), -min_val / (max_val - min_val));
-    scaled_disp_map = (raw_disp_map / (float) 16.0 - (float) stereo_frame_ptr->getMinDisparity())/((float) stereo_frame_ptr->getNumDisparities());
-//    cv::meanStdDev(scaled_disp_map,mean, stddev, mask);
-//    cv::bitwise_not(scaled_disp_map, scaled_disp_map);
+    scaled_disp_map = (raw_disp_map / (float) 16.0 - (float) stereo_frame_ptr->getMinDisparity()) /
+                      ((float) stereo_frame_ptr->getNumDisparities());
+
 
     cv::imshow("Scaled disparity map", scaled_disp_map);
 }
 
-bool
-imgSubscriptionHelper(dji_osdk_ros::StereoVGASubscription &service) {
-    return true;
-}
+
+
+

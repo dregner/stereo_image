@@ -119,6 +119,9 @@ target_link_libraries(calib_stereo  ${OpenCV_LIBS})
 add_executable(camera_calib src/stereo/camera_calib.cpp)
 target_link_libraries(camera_calib  ${OpenCV_LIBS})
 
+add_executable(mean src/stereo/mean_value.cpp)
+target_link_libraries(mean  ${OpenCV_LIBS})
+
 add_executable(save_gps_image src/stereo/stereo_gps_acquisition.cpp)
 target_link_libraries(save_gps_image ${catkin_LIBRARIES} ignition-math4::ignition-math4 )
 
