@@ -32,11 +32,11 @@ M210_STEREO::StereoFrame::initStereoParam() {
     param_rot_stereo_ = Config::get<cv::Mat>("stereoRotationMatrix");
     param_tran_stereo_ = Config::get<cv::Mat>("stereoTransVector");
     cv::Mat Q;
-//    cv::stereoRectify(camera_left_ptr_->getIntrinsic(), camera_left_ptr_->getDistortion(),
-//                      camera_right_ptr_->getIntrinsic(), camera_right_ptr_->getDistortion(),
-//                      cv::Size(VGA_WIDTH, VGA_HEIGHT), param_rot_stereo_, param_tran_stereo_, param_rect_left_,
-//                      param_rect_right_, param_proj_left_, param_proj_right_, Q, CV_CALIB_ZERO_DISPARITY, -1,
-//                      cv::Size(0, 0));
+    cv::stereoRectify(camera_left_ptr_->getIntrinsic(), camera_left_ptr_->getDistortion(),
+                      camera_right_ptr_->getIntrinsic(), camera_right_ptr_->getDistortion(),
+                      cv::Size(VGA_WIDTH, VGA_HEIGHT), param_rot_stereo_, param_tran_stereo_, param_rect_left_,
+                      param_rect_right_, param_proj_left_, param_proj_right_, Q, CV_CALIB_ZERO_DISPARITY, -1,
+                      cv::Size(0, 0));
 
     initUndistortRectifyMap(camera_left_ptr_->getIntrinsic(),
                             camera_left_ptr_->getDistortion(),

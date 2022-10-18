@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "m210_stereo_perception");
     ros::NodeHandle nh;
 
-    std::string yaml_file_path = "/home/vant3d/catkin_ws/src/stereo_image/config/opencv_m210_stereo_calib.yaml";
+    std::string yaml_file_path = "/home/vant3d/catkin_ws/src/stereo_image/config/tb_matlab_m210_stereo_calib.yaml";
     Config::setParamFile(yaml_file_path);
 
     //! Instantiate some relevant objects
@@ -44,8 +44,8 @@ int main(int argc, char **argv) {
             nh.advertise<sensor_msgs::Image>("/stereo_depth_perception/disparity_front_left_image", 10);
 
 
-    img_left_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_left_images", 1);
-    img_right_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_right_images", 1);
+    img_left_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
+    img_right_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
 
     topic_synchronizer = new message_filters::TimeSynchronizer
             <sensor_msgs::Image, sensor_msgs::Image>(img_left_sub, img_right_sub, 10);

@@ -67,7 +67,7 @@ int main() {
     //Read input image
     int i = 0;
 
-    cv::String folder("/home/vant3d/Documents/ufsc/disparity_images/*.png");
+    cv::String folder("/home/vant3d/Pictures/*.png");
     std::vector<cv::String> filenames;
     cv::glob(folder, filenames, false);
 

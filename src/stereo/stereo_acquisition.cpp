@@ -34,11 +34,11 @@ void callback(const sensor_msgs::ImageConstPtr &image_R,
     // Renaming images to the correct format.
     std::string img_counter = "";
     if (counter < 10) {
-        img_counter = "000";
-    } else if (counter > 9 && counter < 100) {
         img_counter = "00";
-    } else if (counter < 99 && counter > 1000){
+    } else if (counter > 9 && counter < 100) {
         img_counter = "0";
+    } else if (counter < 99 && counter > 1000){
+        img_counter = "";
     }
 
 
