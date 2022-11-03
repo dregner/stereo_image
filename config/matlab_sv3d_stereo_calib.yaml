@@ -1,0 +1,31 @@
+%YAML:1.0
+  leftCameraIntrinsicMatrix: !!opencv-matrix
+    rows: 3
+    cols: 3
+    dt: d
+    data: [ 1.458976786305102e4,   0.001300695916260e4,   0.144483019216902e4, 0,  1.457493123586572e4,   0.100125689877694e4, 0, 0, 1.0000]
+  rightCameraIntrinsicMatrix: !!opencv-matrix
+    rows: 3
+    cols: 3
+    dt: d
+    data: [ 458.1354, 0, 330.6925, 0, 458.4238,  236.6657, 0, 0, 1.0000]
+  leftDistCoeffs: !!opencv-matrix
+    rows: 5
+    cols: 1
+    dt: d
+    data: [ 0.0432, -0.0375, -9.5562e-4, 0.0011, 0.0152 ]
+  rightDistCoeffs: !!opencv-matrix
+    rows: 5
+    cols: 1
+    dt: d
+    data: [ 0.0298, 0.0289, 0.0014, -0.0032, -0.0775 ]
+  stereoRotationMatrix: !!opencv-matrix
+    rows: 3
+    cols: 3
+    dt: d
+    data: [ 0.999981802805505,   0.004874977592049,   0.003553681377042, -0.004880140889396,   0.999987046971349,   0.001445722802206, -0.003546587479841,  -0.001463038959903,   0.999992640590044 ]
+  stereoTransVector: !!opencv-matrix
+    rows: 3
+    cols: 1
+    dt: d
+    data: [ -0.113874107314875,  -0.000938666079247,  -0.007017590565307 ]

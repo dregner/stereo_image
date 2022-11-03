@@ -91,6 +91,18 @@ namespace M210_STEREO {
         cv::Mat raw_right_disparity_map_;
         cv::Mat filtered_disparity_map_;
         cv::Mat filtered_disparity_map_8u_;
+
+        int numDisparities = 2;
+        int blockSize = 9;
+        int preFilterType = 1;
+        int preFilterSize = 25;
+        int preFilterCap = 59;
+        int minDisparity = 0;
+        int textureThreshold = 0;
+        int uniquenessRatio = 31;
+        int speckleRange = 30;
+        int speckleWindowSize = 16;
+        int disp12MaxDiff = -1;
     };
 
 } // namespace M210_STEREO

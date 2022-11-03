@@ -44,8 +44,8 @@ int main(int argc, char **argv) {
             nh.advertise<sensor_msgs::Image>("/stereo_depth_perception/disparity_front_left_image", 10);
 
 
-    img_left_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
-    img_right_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
+    img_left_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_left_images", 1);
+    img_right_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_right_images", 1);
 
     topic_synchronizer = new message_filters::TimeSynchronizer
             <sensor_msgs::Image, sensor_msgs::Image>(img_left_sub, img_right_sub, 10);
@@ -81,7 +81,7 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
     //! Filter disparity map
     timer filter_start = std::chrono::high_resolution_clock::now();
     stereo_frame_ptr->filterDisparityMap();
-    is_disp_filterd = false;
+    is_disp_filterd = true;
     timer filter_end = std::chrono::high_resolution_clock::now();
 
     visualizeRectImgHelper(stereo_frame_ptr);
@@ -173,9 +173,9 @@ visualizeDisparityMapHelper(StereoFrame::Ptr stereo_frame_ptr) {
     cv::minMaxLoc(raw_disp_map, &min_val, &max_val, NULL, NULL);
 
     cv::Mat scaled_disp_map;
-//    raw_disp_map.convertTo(scaled_disp_map, CV_8U, 255 / (max_val - min_val), -min_val / (max_val - min_val));
-    scaled_disp_map = (raw_disp_map / (float) 16.0 - (float) stereo_frame_ptr->getMinDisparity()) /
-                      ((float) stereo_frame_ptr->getNumDisparities());
+    raw_disp_map.convertTo(scaled_disp_map, CV_8U, 255 / (max_val - min_val), -min_val / (max_val - min_val));
+//    scaled_disp_map = (raw_disp_map / (float) 16.0 - (float) stereo_frame_ptr->getMinDisparity()) /
+//                      ((float) stereo_frame_ptr->getNumDisparities());
 
 
     cv::imshow("Scaled disparity map", scaled_disp_map);

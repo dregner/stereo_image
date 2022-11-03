@@ -36,7 +36,7 @@ void callback(const sensor_msgs::Image::ConstPtr &msg){
     std::cout << "Aqcuired Image - " << counter << std::endl;
 
     ++counter;
-    ros::Duration(2).sleep();
+    ros::Duration(0.5).sleep();
 
 }
 
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 
     ros::NodeHandle nh;
 
-    ros::Subscriber sub_imu = nh.subscribe("/dji_osdk_ros/fpv_camera_images", 1, callback);
+    ros::Subscriber sub_imu = nh.subscribe("/stereo_depth_perception/disparity_front_left_image", 1, callback);
 
     ros::spin();
     return 0;
