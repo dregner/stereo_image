@@ -1,28 +1,35 @@
 #include <opencv2/opencv.hpp>
 #include <glob.h>
-
+#include <stereo_utility/config.hpp>
 
 
 cv::Mat image, imageClone;
-
 //to store left_t_corner and point on the right_b_corner of the circle
 cv::Point left_t_corner, right_b_corner;
 
-float distance_disp(cv::Rect rect, double &mean_disp){
-    float  baseline_x_fx_ = -45.3569;
-    float principal_x_ = 450.6202;
-    float principal_y_ = 231.8208;
-    float  fx_ = 444.3998;
-    float fy_ = 444.3998;
-    float u = (float) (rect.x + rect.width)/2;
-    float v = (float) (rect.y + rect.height)/2;
+float distance_disp(cv::Rect rect, double &mean_disp) {
+
+
+//    double principal_x_ = param_proj_left_.at<double>(0, 2);
+//    double principal_y_ = param_proj_left_.at<double>(1, 2);
+//    double fx_ = param_proj_left_.at<double>(0, 0);
+//    double fy_ = param_proj_left_.at<double>(1, 1);
+//    double baseline_x_fx_ = -param_proj_right_.at<double>(0, 3);
+
+    float  baseline_x_fx_ = -4.53568575e1;
+    float principal_x_ = 4.5062e2;
+    float principal_y_ = 2.3182e2;
+    float  fx_ = 4.44399799e2;
+    float fy_ = 4.44399799e2;
+    float u = (float) (rect.x + rect.width) / 2;
+    float v = (float) (rect.y + rect.height) / 2;
 
     auto disparity = mean_disp;
     float dist_x, dist_y, dist_z;
-    dist_z = baseline_x_fx_/disparity;
-    dist_x = (u-principal_x_)*(dist_z)/fx_;
-    dist_y = (v-principal_y_)*(dist_z)/fy_;
-    float distance = sqrt(dist_z*dist_z + dist_y*dist_y + dist_x*dist_x);
+    dist_z = baseline_x_fx_ / disparity;
+    dist_x = (u - principal_x_) * (dist_z) / fx_;
+    dist_y = (v - principal_y_) * (dist_z) / fy_;
+    float distance = sqrt(dist_z * dist_z + dist_y * dist_y + dist_x * dist_x);
     return distance;
 }
 
@@ -52,9 +59,9 @@ void drawCircle(int action, int x, int y, int flags, void *userdata) {
         //Draw circle
         cv::rectangle(imageClone, left_t_corner, right_b_corner, cv::Scalar(0, 255, 0), 1, CV_AA);
         double mean = average_disparity(imageClone, left_t_corner, right_b_corner);
-        float dist = distance_disp(cv::Rect(left_t_corner,right_b_corner), mean);
+        float dist = distance_disp(cv::Rect(left_t_corner, right_b_corner), mean);
         std::string label = cv::format("Mean value : %.2f px", mean);
-        std::cout<<"Pixel mean: " << mean << " px \t Distance: "<< dist*10 << " m" << std::endl;
+        std::cout << "Pixel mean: " << mean << " px \t Distance: " << dist * 10 << " m" << std::endl;
         putText(imageClone, label, cv::Point(100, 100),
                 cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 5);
         imshow("image", imageClone);
@@ -67,7 +74,7 @@ int main() {
     //Read input image
     int i = 0;
 
-    cv::String folder("/home/vant3d/Pictures/*.png");
+    cv::String folder("/home/vant3d/Documents/rosbag/disparity/*.jpg");
     std::vector<cv::String> filenames;
     cv::glob(folder, filenames, false);
 

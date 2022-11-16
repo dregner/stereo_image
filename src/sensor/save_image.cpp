@@ -30,7 +30,7 @@ void callback(const sensor_msgs::Image::ConstPtr &msg){
         return;
     }
     std::stringstream writeFPV;
-    writeFPV << "FPV" << img_counter << counter << ".png";
+    writeFPV << "disparity" << img_counter << counter << ".png";
     cv::imwrite(writeFPV.str(), cv_ptr_FPV->image);
 
     std::cout << "Aqcuired Image - " << counter << std::endl;

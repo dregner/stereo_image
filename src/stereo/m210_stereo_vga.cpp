@@ -5,7 +5,6 @@ using namespace M210_STEREO;
 // for visualization purpose
 bool is_disp_filterd;
 int count = 1;
-dji_osdk_ros::StereoVGASubscription subscription;
 ros::Publisher rect_img_left_publisher;
 ros::Publisher rect_img_right_publisher;
 ros::Publisher left_disparity_publisher;
@@ -85,7 +84,7 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
     timer filter_end = std::chrono::high_resolution_clock::now();
 
     visualizeRectImgHelper(stereo_frame_ptr);
-
+//
     visualizeDisparityMapHelper(stereo_frame_ptr);
 
     sensor_msgs::Image rect_left_img = *img_left;
@@ -98,7 +97,7 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
            stereo_frame_ptr->getRectRightImg().data,
            img_right->height * img_right->width);
     memcpy((char *) (&disparity_map.data[0]),
-           stereo_frame_ptr->getFilteredDispMap().data,
+           stereo_frame_ptr->getDisparityMap().data,
            img_left->height * img_left->width);
 
     rect_img_left_publisher.publish(rect_left_img);
