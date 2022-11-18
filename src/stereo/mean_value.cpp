@@ -15,10 +15,16 @@ float distance_disp(cv::Rect rect, double &mean_disp) {
 //    double fx_ = param_proj_left_.at<double>(0, 0);
 //    double fy_ = param_proj_left_.at<double>(1, 1);
 //    double baseline_x_fx_ = -param_proj_right_.at<double>(0, 3);
-
+    //! Values from matlab
+//    float  baseline_x_fx_ = -4.53568575e1;
+//    float principal_x_ = 4.5062e2;
+//    float principal_y_ = 2.3182e2;
+//    float  fx_ = 4.44399799e2;
+//    float fy_ = 4.44399799e2;
+    //! Values form opencv
     float  baseline_x_fx_ = -4.53568575e1;
-    float principal_x_ = 4.5062e2;
-    float principal_y_ = 2.3182e2;
+    float principal_x_ = 4.50620243 e2;
+    float principal_y_ = 2.3182076e2;
     float  fx_ = 4.44399799e2;
     float fy_ = 4.44399799e2;
     float u = (float) (rect.x + rect.width) / 2;
@@ -74,7 +80,7 @@ int main() {
     //Read input image
     int i = 0;
 
-    cv::String folder("/home/vant3d/Documents/rosbag/disparity/*.jpg");
+    cv::String folder("/home/vant3d/Pictures/*.jpg");
     std::vector<cv::String> filenames;
     cv::glob(folder, filenames, false);
 

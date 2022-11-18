@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "m210_stereo_perception");
     ros::NodeHandle nh;
 
-    std::string yaml_file_path = "/home/vant3d/catkin_ws/src/stereo_image/config/tb_matlab_m210_stereo_calib.yaml";
+    std::string yaml_file_path = "/home/vant3d/catkin_ws/src/stereo_image/config/opencv_m210_stereo_calib.yaml";
     Config::setParamFile(yaml_file_path);
 
     //! Instantiate some relevant objects
@@ -96,10 +96,16 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
     memcpy((char *) (&rect_right_img.data[0]),
            stereo_frame_ptr->getRectRightImg().data,
            img_right->height * img_right->width);
-    memcpy((char *) (&disparity_map.data[0]),
-           stereo_frame_ptr->getDisparityMap().data,
-           img_left->height * img_left->width);
-
+    if(is_disp_filterd) {
+        memcpy((char *) (&disparity_map.data[0]),
+               stereo_frame_ptr->getFilteredDispMap().data,
+               img_left->height * img_left->width);
+    }
+    else{
+        memcpy((char *) (&disparity_map.data[0]),
+               stereo_frame_ptr->getDisparityMap().data,
+               img_left->height * img_left->width);
+    }
     rect_img_left_publisher.publish(rect_left_img);
     rect_img_right_publisher.publish(rect_right_img);
     left_disparity_publisher.publish(disparity_map);

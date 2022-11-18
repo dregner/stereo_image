@@ -66,7 +66,7 @@ M210_STEREO::StereoFrame::initStereoParam() {
 
     wls_filter_ = cv::ximgproc::createDisparityWLSFilter(block_matcher_); // left_matcher
     wls_filter_->setLambda(8000.0);
-    wls_filter_->setSigmaColor(1.5);
+    wls_filter_->setSigmaColor(2);
 
     right_matcher_ = cv::ximgproc::createRightMatcher(block_matcher_);
 
@@ -120,7 +120,7 @@ void M210_STEREO::StereoFrame::filterDisparityMap() {
                         filtered_disparity_map_,
                         raw_right_disparity_map_);
 
-    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.625); //CV_8UC1
+    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.80); //CV_8UC1 0.625
 
 }
 
