@@ -80,7 +80,7 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
     //! Filter disparity map
     timer filter_start = std::chrono::high_resolution_clock::now();
     stereo_frame_ptr->filterDisparityMap();
-    is_disp_filterd = true;
+    is_disp_filterd = false;
     timer filter_end = std::chrono::high_resolution_clock::now();
 
     visualizeRectImgHelper(stereo_frame_ptr);
@@ -182,8 +182,40 @@ visualizeDisparityMapHelper(StereoFrame::Ptr stereo_frame_ptr) {
 //    scaled_disp_map = (raw_disp_map / (float) 16.0 - (float) stereo_frame_ptr->getMinDisparity()) /
 //                      ((float) stereo_frame_ptr->getNumDisparities());
 
-
+    cv::rectangle(scaled_disp_map, cv::Point(scaled_disp_map.cols/2-10, scaled_disp_map.rows/2-10), cv::Point(scaled_disp_map.cols/2+10, scaled_disp_map.rows/2+10), cv::Scalar(0, 255, 0), 1, CV_AA);
     cv::imshow("Scaled disparity map", scaled_disp_map);
+}
+
+float distance_disp(cv::Mat image) {
+
+
+//    double principal_x_ = param_proj_left_.at<double>(0, 2);
+//    double principal_y_ = param_proj_left_.at<double>(1, 2);
+//    double fx_ = param_proj_left_.at<double>(0, 0);
+//    double fy_ = param_proj_left_.at<double>(1, 1);
+//    double baseline_x_fx_ = -param_proj_right_.at<double>(0, 3);
+    std::vector<cv::Mat> channels;
+    cv::Rect crop(cv::Point(image.cols/2-10, image.rows/2-10), cv::Point(image.cols/2+10, image.rows/2+10));
+    cv::Mat img_crop = image(crop);
+    cv::split(img_crop, channels);
+    cv::Scalar m = mean(channels[0]);
+    float disparity = m[0];
+
+    //! Values form opencv
+    float  baseline_x_fx_ = -4.53568575e1;
+    float principal_x_ = 4.50620243e2;
+    float principal_y_ = 2.3182076e2;
+    float  fx_ = 4.44399799e2;
+    float fy_ = 4.44399799e2;
+    float u = (float) (crop.x + crop.width) / 2;
+    float v = (float) (crop.y + crop.height) / 2;
+
+    float dist_x, dist_y, dist_z;
+    dist_z = baseline_x_fx_ / disparity;
+    dist_x = (u - principal_x_) * (dist_z) / fx_;
+    dist_y = (v - principal_y_) * (dist_z) / fy_;
+    float distance = sqrt(dist_z * dist_z + dist_y * dist_y + dist_x * dist_x);
+    return distance;
 }
 
 

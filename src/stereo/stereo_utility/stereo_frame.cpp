@@ -120,7 +120,7 @@ void M210_STEREO::StereoFrame::filterDisparityMap() {
                         filtered_disparity_map_,
                         raw_right_disparity_map_);
 
-    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.06); //CV_8UC1
+    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.8); //CV_8UC1
 
 }
 
