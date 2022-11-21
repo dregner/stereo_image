@@ -1,9 +1,10 @@
 #include <opencv2/opencv.hpp>
 #include <glob.h>
-#include <stereo_utility/config.hpp>
+
 
 
 cv::Mat image, imageClone;
+
 //to store left_t_corner and point on the right_b_corner of the circle
 cv::Point left_t_corner, right_b_corner;
 

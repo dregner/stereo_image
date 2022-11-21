@@ -32,11 +32,11 @@ M210_STEREO::StereoFrame::initStereoParam() {
     param_rot_stereo_ = Config::get<cv::Mat>("stereoRotationMatrix");
     param_tran_stereo_ = Config::get<cv::Mat>("stereoTransVector");
     cv::Mat Q;
-//    cv::stereoRectify(camera_left_ptr_->getIntrinsic(), camera_left_ptr_->getDistortion(),
-//                      camera_right_ptr_->getIntrinsic(), camera_right_ptr_->getDistortion(),
-//                      cv::Size(VGA_WIDTH, VGA_HEIGHT), param_rot_stereo_, param_tran_stereo_, param_rect_left_,
-//                      param_rect_right_, param_proj_left_, param_proj_right_, Q, CV_CALIB_ZERO_DISPARITY, -1,
-//                      cv::Size(0, 0));
+    cv::stereoRectify(camera_left_ptr_->getIntrinsic(), camera_left_ptr_->getDistortion(),
+                      camera_right_ptr_->getIntrinsic(), camera_right_ptr_->getDistortion(),
+                      cv::Size(VGA_WIDTH, VGA_HEIGHT), param_rot_stereo_, param_tran_stereo_, param_rect_left_,
+                      param_rect_right_, param_proj_left_, param_proj_right_, Q, CV_CALIB_ZERO_DISPARITY, -1,
+                      cv::Size(0, 0));
 
     initUndistortRectifyMap(camera_left_ptr_->getIntrinsic(),
                             camera_left_ptr_->getDistortion(),
@@ -66,7 +66,7 @@ M210_STEREO::StereoFrame::initStereoParam() {
 
     wls_filter_ = cv::ximgproc::createDisparityWLSFilter(block_matcher_); // left_matcher
     wls_filter_->setLambda(8000.0);
-    wls_filter_->setSigmaColor(2);
+    wls_filter_->setSigmaColor(1.5);
 
     right_matcher_ = cv::ximgproc::createRightMatcher(block_matcher_);
 
@@ -106,7 +106,7 @@ void M210_STEREO::StereoFrame::computeDisparityMap() {
     //! CPU implementation of stereoBM outputs short int, i.e. CV_16S
     block_matcher_->compute(rectified_img_left_, rectified_img_right_, raw_disparity_map_);
 
-    raw_disparity_map_.convertTo(disparity_map_8u_, CV_8UC1, 1);//0.625); //! 0.0625
+    raw_disparity_map_.convertTo(disparity_map_8u_, CV_8UC1, 0.625); //! 0.0625
 
 
 }
@@ -120,7 +120,7 @@ void M210_STEREO::StereoFrame::filterDisparityMap() {
                         filtered_disparity_map_,
                         raw_right_disparity_map_);
 
-    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.80); //CV_8UC1 0.625
+    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.06); //CV_8UC1
 
 }
 

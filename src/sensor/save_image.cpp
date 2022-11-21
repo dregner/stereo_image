@@ -17,12 +17,12 @@ void callback(const sensor_msgs::Image::ConstPtr &msg){
         img_counter = "000";
     } else if (counter > 9 && counter < 100) {
         img_counter = "00";
-    } else if (counter < 99 && counter > 1000){
+    } else if (counter > 99 && counter < 1000){
         img_counter = "0";
-    }
+    }else { img_counter = "";}
 
     try{
-        cv_ptr_FPV = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        cv_ptr_FPV = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
 
     }
     catch (cv_bridge::Exception &e) {
