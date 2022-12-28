@@ -34,7 +34,22 @@ double average_disparity(cv::Mat &image, cv::Point pt1, cv::Point pt2) {
     cv::Mat img_crop = gray(crop);
     cv::split(img_crop, channels);
     cv::Scalar m = mean(channels[0]);
-    return m[0];
+
+    float  baseline_x_fx_ = -45.3569;
+    float principal_x_ = 450.6202;
+    float principal_y_ = 231.8208;
+    float  fx_ = 444.3998;
+    float fy_ = 444.3998;
+    float u = (float) (crop.x + crop.width)/2;
+    float v = (float) (crop.y + crop.height)/2;
+
+    float disparity = (float) m[0];
+    float dist_x, dist_y, dist_z;
+    dist_z = baseline_x_fx_/disparity;
+    dist_x = (u-principal_x_)*(dist_z)/fx_;
+    dist_y = (v-principal_y_)*(dist_z)/fy_;
+    float distance = sqrt(dist_z*dist_z + dist_y*dist_y + dist_x*dist_x);
+    return distance;
 }
 
 

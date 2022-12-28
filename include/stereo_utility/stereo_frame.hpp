@@ -18,8 +18,7 @@ namespace M210_STEREO {
     public:
         typedef std::shared_ptr<StereoFrame> Ptr;
 
-        StereoFrame(CameraParam::Ptr left_cam, CameraParam::Ptr right_cam,
-                    int num_disp = 32, int block_size = 13);
+        StereoFrame(CameraParam::Ptr left_cam, CameraParam::Ptr right_cam);
 
         ~StereoFrame();
 
@@ -78,9 +77,7 @@ namespace M210_STEREO {
         cv::Mat rectified_img_left_;
         cv::Mat rectified_img_right_;
 
-        //! Block matching related
-        int num_disp_;
-        int block_size_;
+
         cv::Ptr<cv::StereoBM> block_matcher_;
         cv::Mat disparity_map_8u_;
         cv::Mat raw_disparity_map_;
@@ -91,6 +88,19 @@ namespace M210_STEREO {
         cv::Mat raw_right_disparity_map_;
         cv::Mat filtered_disparity_map_;
         cv::Mat filtered_disparity_map_8u_;
+
+        //! Block matching related
+        int numDisparities = 2;
+        int blockSize = 9;
+        int preFilterType = 1;
+        int preFilterSize = 25;
+        int preFilterCap = 59;
+        int minDisparity = 0;
+        int textureThreshold = 0;
+        int uniquenessRatio = 31;
+        int speckleRange = 30;
+        int speckleWindowSize = 16;
+        int disp12MaxDiff = -1;
     };
 
 } // namespace M210_STEREO

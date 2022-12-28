@@ -1,4 +1,5 @@
 #include "m210_stereo_vga.h"
+#include <darknet_ros_msgs/BoundingBoxes.h>
 
 using namespace M210_STEREO;
 
@@ -9,7 +10,6 @@ dji_osdk_ros::StereoVGASubscription subscription;
 ros::Publisher rect_img_left_publisher;
 ros::Publisher rect_img_right_publisher;
 ros::Publisher left_disparity_publisher;
-
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "m210_stereo_perception");
@@ -23,9 +23,10 @@ int main(int argc, char **argv) {
     CameraParam::Ptr camera_right_ptr;
     StereoFrame::Ptr stereo_frame_ptr;
 
-    message_filters::Subscriber <sensor_msgs::Image> img_left_sub;
-    message_filters::Subscriber <sensor_msgs::Image> img_right_sub;
-    message_filters::TimeSynchronizer <sensor_msgs::Image, sensor_msgs::Image> *topic_synchronizer;
+    message_filters::Subscriber<sensor_msgs::Image> img_left_sub;
+    message_filters::Subscriber<sensor_msgs::Image> img_right_sub;
+    message_filters::Subscriber<darknet_ros_msgs::BoundingBoxes> bb_darknet_sub;
+    message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::Image> *topic_synchronizer;
 
 
     //! Setup stereo frame
@@ -44,8 +45,8 @@ int main(int argc, char **argv) {
             nh.advertise<sensor_msgs::Image>("/stereo_depth_perception/disparity_front_left_image", 10);
 
 
-    img_left_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_left_images", 1);
-    img_right_sub.subscribe(nh, "/dji_sdk/stereo_vga_front_right_images", 1);
+    img_left_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_left_images", 1);
+    img_right_sub.subscribe(nh, "/dji_osdk_ros/stereo_vga_front_right_images", 1);
 
     topic_synchronizer = new message_filters::TimeSynchronizer
             <sensor_msgs::Image, sensor_msgs::Image>(img_left_sub, img_right_sub, 10);
@@ -84,9 +85,9 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
     is_disp_filterd = false;
     timer filter_end = std::chrono::high_resolution_clock::now();
 
-    visualizeRectImgHelper(stereo_frame_ptr);
+//    visualizeRectImgHelper(stereo_frame_ptr);
 
-    visualizeDisparityMapHelper(stereo_frame_ptr);
+//    visualizeDisparityMapHelper(stereo_frame_ptr);
 
     sensor_msgs::Image rect_left_img = *img_left;
     sensor_msgs::Image rect_right_img = *img_right;
@@ -97,14 +98,25 @@ void displayStereoFilteredDisparityCallback(const sensor_msgs::ImageConstPtr &im
     memcpy((char *) (&rect_right_img.data[0]),
            stereo_frame_ptr->getRectRightImg().data,
            img_right->height * img_right->width);
-    memcpy((char *) (&disparity_map.data[0]),
-           stereo_frame_ptr->getFilteredDispMap().data,
-           img_left->height * img_left->width);
+    if(is_disp_filterd) {
+        memcpy((char *) (&disparity_map.data[0]),
+               stereo_frame_ptr->getFilteredDispMap().data,
+               img_left->height * img_left->width);
+        cv::Mat disp_copy = stereo_frame_ptr->getFilteredDispMap();
+
+    }
+    else{
+        memcpy((char *) (&disparity_map.data[0]),
+               stereo_frame_ptr->getDisparityMap().data,
+               img_left->height * img_left->width);
+        cv::Mat disp_copy = stereo_frame_ptr->getDisparityMap();
+
+    }
+
 
     rect_img_left_publisher.publish(rect_left_img);
     rect_img_right_publisher.publish(rect_right_img);
     left_disparity_publisher.publish(disparity_map);
-
 
     cv::waitKey(1);
 
@@ -142,21 +154,11 @@ visualizeRectImgHelper(StereoFrame::Ptr stereo_frame_ptr) {
     cv::imshow("Rectified Stereo Imgs with epipolar lines", img_to_show);
 
     std::stringstream writeD;
-    writeD <<  "Disparity" << count << ".png";
+    writeD << "Disparity" << count << ".png";
     cv::imwrite(writeD.str(), stereo_frame_ptr->getDisparityMap());
     count++;
 }
 
-cv::Mat average_disparity(cv::Mat &image, int x, int y, int h, int w) {
-    std::vector<cv::Mat> channels;
-    cv::Rect crop(x, y, h, w);
-    cv::Mat img_crop = image(crop);
-    cv::split(img_crop, channels);
-    cv::Scalar m = mean(channels[0]);
-    printf("%f\n", m[0]);
-    cv::putText(image, "Mean Disparity: ", cvPoint(20, 20), CV_FONT_HERSHEY_SIMPLEX, 1, cvScalar(255, 0, 0), 2);
-    return image;
-}
 
 void
 visualizeDisparityMapHelper(StereoFrame::Ptr stereo_frame_ptr) {
@@ -180,7 +182,6 @@ visualizeDisparityMapHelper(StereoFrame::Ptr stereo_frame_ptr) {
 
     cv::imshow("Scaled disparity map", scaled_disp_map);
 }
-
 
 
 

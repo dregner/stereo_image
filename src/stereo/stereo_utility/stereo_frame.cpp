@@ -4,9 +4,8 @@
 //using namespace M210_STEREO;
 
 M210_STEREO::StereoFrame::StereoFrame(CameraParam::Ptr left_cam,
-                                      CameraParam::Ptr right_cam,
-                                      int num_disp, int block_size)
-        : camera_left_ptr_(left_cam), camera_right_ptr_(right_cam), num_disp_(num_disp), block_size_(block_size),
+                                      CameraParam::Ptr right_cam)
+        : camera_left_ptr_(left_cam), camera_right_ptr_(right_cam),
           raw_disparity_map_(cv::Mat(VGA_HEIGHT, VGA_WIDTH, CV_16SC1)) {
     if (!this->initStereoParam()) {
         ROS_ERROR("Failed to init stereo parameters\n");
@@ -52,16 +51,17 @@ M210_STEREO::StereoFrame::initStereoParam() {
                             rectified_mapping_[1][0], rectified_mapping_[1][1]);
 
     block_matcher_ = cv::StereoBM::create();
-    block_matcher_->setNumDisparities(16);
-    block_matcher_->setBlockSize(19);
-    block_matcher_->setPreFilterType(1);
-    block_matcher_->setPreFilterSize(17);
-    block_matcher_->setPreFilterCap(57);
-    block_matcher_->setTextureThreshold(0);
-    block_matcher_->setUniquenessRatio(50);
-    block_matcher_->setSpeckleRange(44);
-    block_matcher_->setSpeckleWindowSize(25);
-    block_matcher_->setDisp12MaxDiff(0);
+    block_matcher_->setNumDisparities(numDisparities*16);
+    block_matcher_->setBlockSize(blockSize*2+5);
+    block_matcher_->setPreFilterType(preFilterType);
+    block_matcher_->setPreFilterSize(preFilterSize*2+5);
+    block_matcher_->setPreFilterCap(preFilterCap);
+    block_matcher_->setTextureThreshold(textureThreshold);
+    block_matcher_->setUniquenessRatio(uniquenessRatio);
+    block_matcher_->setSpeckleRange(speckleRange);
+    block_matcher_->setSpeckleWindowSize(speckleWindowSize);
+    block_matcher_->setDisp12MaxDiff(disp12MaxDiff);
+    block_matcher_->setMinDisparity(minDisparity);
 
 
     wls_filter_ = cv::ximgproc::createDisparityWLSFilter(block_matcher_); // left_matcher
@@ -106,7 +106,7 @@ void M210_STEREO::StereoFrame::computeDisparityMap() {
     //! CPU implementation of stereoBM outputs short int, i.e. CV_16S
     block_matcher_->compute(rectified_img_left_, rectified_img_right_, raw_disparity_map_);
 
-    raw_disparity_map_.convertTo(disparity_map_8u_, CV_32F, 1); //! 0.0625
+    raw_disparity_map_.convertTo(disparity_map_8u_, CV_8UC1, 0.725); //! 0.0625
 
 
 }
@@ -120,7 +120,7 @@ void M210_STEREO::StereoFrame::filterDisparityMap() {
                         filtered_disparity_map_,
                         raw_right_disparity_map_);
 
-    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.06);
+    filtered_disparity_map_.convertTo(filtered_disparity_map_8u_, CV_8UC1, 0.8);
 
 }
 
