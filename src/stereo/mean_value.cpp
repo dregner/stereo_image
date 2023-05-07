@@ -82,7 +82,7 @@ int main() {
     //Read input image
     int i = 0;
 
-    cv::String folder("/home/vant3d/Pictures/*.png");
+    cv::String folder("/home/vant3d/Documents/rosbag/disp3_distances/*.jpg");
     std::vector<cv::String> filenames;
     cv::glob(folder, filenames, false);
 
