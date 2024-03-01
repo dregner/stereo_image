@@ -24,7 +24,7 @@ float distance_disp(cv::Rect rect, double &mean_disp) {
 //    float fy_ = 4.44399799e2;
     //! Values form opencv
     float  baseline_x_fx_ = -4.53568575e1;
-    float principal_x_ = 4.50620243 e2;
+    float principal_x_ = 4.50620243e2;
     float principal_y_ = 2.3182076e2;
     float  fx_ = 4.44399799e2;
     float fy_ = 4.44399799e2;
